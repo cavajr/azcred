@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<design>
+    <page>
+        <format>a4</format>
+        <orientation>P</orientation>
+    </page>
+    <rectangle id="1">
+        <class>Rectangle</class>
+        <x>24</x>
+        <y>28</y>
+        <width>544</width>
+        <height>73</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="2">
+        <class>Text</class>
+        <x>34</x>
+        <y>38</y>
+        <font>Arial</font>
+        <size>20</size>
+        <text>&lt;b&gt;EXTRATO FINANCEIRO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="3">
+        <class>Text</class>
+        <x>34</x>
+        <y>64</y>
+        <font>Arial</font>
+        <size>13</size>
+        <text>&lt;b&gt;{cabecalho}&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="4">
+        <class>Text</class>
+        <x>34</x>
+        <y>84</y>
+        <font>Arial</font>
+        <size>11</size>
+        <text>&lt;b&gt;{periodo}&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="5">
+        <class>Rectangle</class>
+        <x>24</x>
+        <y>110</y>
+        <width>52</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="6">
+        <class>Text</class>
+        <x>35</x>
+        <y>118</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;TIPO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="7">
+        <class>Rectangle</class>
+        <x>76</x>
+        <y>110</y>
+        <width>52</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="8">
+        <class>Text</class>
+        <x>88</x>
+        <y>118</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;DATA&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="9">
+        <class>Rectangle</class>
+        <x>128</x>
+        <y>110</y>
+        <width>350</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="10">
+        <class>Text</class>
+        <x>133</x>
+        <y>118</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;NOME&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="11">
+        <class>Rectangle</class>
+        <x>478</x>
+        <y>110</y>
+        <width>90</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="12">
+        <class>Text</class>
+        <x>504</x>
+        <y>118</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;VALOR&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <anchor id="13">
+        <class>Anchor</class>
+        <x>24</x>
+        <y>138</y>
+        <name>detalhes</name>
+    </anchor>
+</design>

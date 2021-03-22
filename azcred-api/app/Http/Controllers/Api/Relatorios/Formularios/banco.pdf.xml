@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<design>
+    <page>
+        <format>a4</format>
+        <orientation>L</orientation>
+    </page>
+    <rectangle id="1">
+        <class>Rectangle</class>
+        <x>30</x>
+        <y>34</y>
+        <width>778</width>
+        <height>87</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <image id="2">
+        <class>Image</class>
+        <x>36</x>
+        <y>38</y>
+        <width>90</width>
+        <height>79</height>
+        <file>C:\xampp\htdocs\sisestoque\app\images\logo.jpg</file>
+    </image>
+    <text id="3">
+        <class>Text</class>
+        <x>128</x>
+        <y>42</y>
+        <font>Arial</font>
+        <size>18</size>
+        <text>&lt;b&gt;PREFEITURA MUNICIPAL DE PATOS&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="4">
+        <class>Text</class>
+        <x>128</x>
+        <y>62</y>
+        <font>Arial</font>
+        <size>16</size>
+        <text>&lt;b&gt;SECRETARIA DE EDUCAÇÃO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="5">
+        <class>Text</class>
+        <x>128</x>
+        <y>79</y>
+        <font>Arial</font>
+        <size>14</size>
+        <text>&lt;b&gt;ALMOXARIFADO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="6">
+        <class>Text</class>
+        <x>128</x>
+        <y>95</y>
+        <font>Arial</font>
+        <size>12</size>
+        <text>&lt;b&gt;RELAÇÃO DE MATERIAIS&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="7">
+        <class>Text</class>
+        <x>128</x>
+        <y>110</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>{cabecalho}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="8">
+        <class>Rectangle</class>
+        <x>30</x>
+        <y>132</y>
+        <width>60</width>
+        <height>24</height>
+        <fillcolor>#C8C8C8</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="9">
+        <class>Rectangle</class>
+        <x>90</x>
+        <y>132</y>
+        <width>72</width>
+        <height>24</height>
+        <fillcolor>#C8C8C8</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="10">
+        <class>Rectangle</class>
+        <x>162</x>
+        <y>132</y>
+        <width>360</width>
+        <height>24</height>
+        <fillcolor>#C8C8C8</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="11">
+        <class>Rectangle</class>
+        <x>522</x>
+        <y>132</y>
+        <width>38</width>
+        <height>24</height>
+        <fillcolor>#C8C8C8</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="12">
+        <class>Rectangle</class>
+        <x>560</x>
+        <y>132</y>
+        <width>248</width>
+        <height>24</height>
+        <fillcolor>#C8C8C8</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="13">
+        <class>Text</class>
+        <x>44</x>
+        <y>140</y>
+        <font>Arial</font>
+        <size>12</size>
+        <text>&lt;b&gt;ÍTEM&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="14">
+        <class>Text</class>
+        <x>100</x>
+        <y>140</y>
+        <font>Arial</font>
+        <size>12</size>
+        <text>&lt;b&gt;CÓDIGO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="15">
+        <class>Text</class>
+        <x>170</x>
+        <y>140</y>
+        <font>Arial</font>
+        <size>12</size>
+        <text>&lt;b&gt;MATERIAL&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="16">
+        <class>Text</class>
+        <x>526</x>
+        <y>140</y>
+        <font>Arial</font>
+        <size>12</size>
+        <text>&lt;b&gt;UND&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="17">
+        <class>Text</class>
+        <x>565</x>
+        <y>140</y>
+        <font>Arial</font>
+        <size>12</size>
+        <text>&lt;b&gt;GRUPO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <anchor id="18">
+        <class>Anchor</class>
+        <x>30</x>
+        <y>164</y>
+        <name>detalhes</name>
+    </anchor>
+</design>

@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<design>
+    <page>
+        <format>a4</format>
+        <orientation>L</orientation>
+    </page>
+    <rectangle id="1">
+        <class>Rectangle</class>
+        <x>18</x>
+        <y>28</y>
+        <width>806</width>
+        <height>78</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="2">
+        <class>Text</class>
+        <x>26</x>
+        <y>38</y>
+        <font>Arial</font>
+        <size>20</size>
+        <text>&lt;b&gt;RELATÓRIO DE CONTRATOS POR CORRETOR&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="3">
+        <class>Text</class>
+        <x>26</x>
+        <y>64</y>
+        <font>Arial</font>
+        <size>13</size>
+        <text>&lt;b&gt;{cabecalho}&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="4">
+        <class>Text</class>
+        <x>26</x>
+        <y>85</y>
+        <font>Arial</font>
+        <size>11</size>
+        <text>&lt;b&gt;{periodo}&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="5">
+        <class>Rectangle</class>
+        <x>17</x>
+        <y>140</y>
+        <width>48</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="6">
+        <class>Rectangle</class>
+        <x>65</x>
+        <y>140</y>
+        <width>142</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="7">
+        <class>Rectangle</class>
+        <x>207</x>
+        <y>140</y>
+        <width>32</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="8">
+        <class>Rectangle</class>
+        <x>239</x>
+        <y>140</y>
+        <width>26</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="9">
+        <class>Rectangle</class>
+        <x>265</x>
+        <y>140</y>
+        <width>96</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="10">
+        <class>Rectangle</class>
+        <x>361</x>
+        <y>140</y>
+        <width>102</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="11">
+        <class>Rectangle</class>
+        <x>463</x>
+        <y>140</y>
+        <width>100</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="12">
+        <class>Rectangle</class>
+        <x>599</x>
+        <y>140</y>
+        <width>20</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="13">
+        <class>Rectangle</class>
+        <x>619</x>
+        <y>140</y>
+        <width>20</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="14">
+        <class>Rectangle</class>
+        <x>639</x>
+        <y>140</y>
+        <width>32</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="15">
+        <class>Rectangle</class>
+        <x>671</x>
+        <y>140</y>
+        <width>76</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="16">
+        <class>Rectangle</class>
+        <x>747</x>
+        <y>140</y>
+        <width>76</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="17">
+        <class>Text</class>
+        <x>28</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;CPF&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="18">
+        <class>Text</class>
+        <x>66</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;CLIENTE&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="19">
+        <class>Text</class>
+        <x>208</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;DATA&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="20">
+        <class>Text</class>
+        <x>238</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;TIPO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="21">
+        <class>Text</class>
+        <x>462</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;SITUAÇÃO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="22">
+        <class>Text</class>
+        <x>266</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;BANCO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="23">
+        <class>Text</class>
+        <x>362</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;CONVÊNIO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="24">
+        <class>Text</class>
+        <x>599</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;FP&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="25">
+        <class>Text</class>
+        <x>620</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;CP&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="26">
+        <class>Text</class>
+        <x>638</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;PARC&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="27">
+        <class>Text</class>
+        <x>671</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;EMPRÉSTIMO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="28">
+        <class>Text</class>
+        <x>747</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;LÍQUIDO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <anchor id="29">
+        <class>Anchor</class>
+        <x>19</x>
+        <y>170</y>
+        <name>detalhes</name>
+    </anchor>
+    <rectangle id="30">
+        <class>Rectangle</class>
+        <x>17</x>
+        <y>116</y>
+        <width>806</width>
+        <height>24</height>
+        <fillcolor>#E1D2D2</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="31">
+        <class>Text</class>
+        <x>27</x>
+        <y>124</y>
+        <font>Arial</font>
+        <size>12</size>
+        <text>&lt;b&gt;CORRETOR:&lt;/b&gt; </text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <anchor id="32">
+        <class>Anchor</class>
+        <x>103</x>
+        <y>126</y>
+        <name>corretor</name>
+    </anchor>
+    <rectangle id="33">
+        <class>Rectangle</class>
+        <x>563</x>
+        <y>140</y>
+        <width>36</width>
+        <height>24</height>
+        <fillcolor>#DEDEDE</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>1</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="34">
+        <class>Text</class>
+        <x>570</x>
+        <y>148</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;SIT.&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+</design>

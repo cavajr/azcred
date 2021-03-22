@@ -1,0 +1,236 @@
+<p-blockUI [blocked]="loading">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Filtros</strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="pesquisar()">
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label>Banco</label>
+                  <ng-select
+                    [class.is-invalid]="banco_id.invalid && banco_id.touched"
+                    [(ngModel)]="filtro.banco_id"
+                    name="banco_id"
+                    #banco_id="ngModel"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let banco of listaBancos"
+                      [value]="banco.id"
+                      [disabled]="banco.ativo == 'N'"
+                      >{{ banco.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="banco_id"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label>Convênio</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      convenio_id.invalid && convenio_id.touched
+                    "
+                    [(ngModel)]="filtro.convenio_id"
+                    name="convenio_id"
+                    #convenio_id="ngModel"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let convenio of listaConvenios"
+                      [value]="convenio.id"
+                      [disabled]="convenio.ativo == 'N'"
+                      >{{ convenio.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="convenio_id"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label>Tipo de Contrato</label>
+                  <ng-select
+                    [class.is-invalid]="tipo_id.invalid && tipo_id.touched"
+                    [(ngModel)]="filtro.tipo_id"
+                    #tipo_id="ngModel"
+                    [items]="listaTipos"
+                    [bindLabel]="'label'"
+                    [bindValue]="'value'"
+                    name="tipo_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                  </ng-select>
+                  <app-message
+                    [control]="tipo_id"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label>Perfil</label>
+                  <ng-select
+                    [class.is-invalid]="perfil_id.invalid && perfil_id.touched"
+                    [(ngModel)]="filtro.perfil_id"
+                    name="perfil_id"
+                    #perfil_id="ngModel"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let perfil of listaPerfis"
+                      [value]="perfil.id"
+                      >{{ perfil.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="perfil_id"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-12">
+                <button
+                  class="btn btn-sm btn-success"
+                  type="submit"
+                  [disabled]="!f.valid"
+                >
+                  <i class="fa  fa-search"></i>
+                  <span class="hidden-xs  hidden-sm"> Pesquisar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-12" *ngIf="tabelas.length > 0">
+    <div class="card">
+      <div class="card-header">
+        <strong>Listagem</strong>
+      </div>      
+
+      <div class="card-body table-responsive" *ngIf="!auth.isCorretor()">
+        <table
+          class="table table-condensed table-bordered table-hover table-responsive-sm"
+        >
+          <tr style="font-size: 0.8em;">
+            <th rowspan="3" class="align-middle">CÓDIGO</th>
+            <th rowspan="3" class="align-middle">BANCO</th>
+            <th rowspan="3" class="align-middle">CONVÊNIO</th>
+            <th rowspan="3" class="align-middle">TIPO</th>
+            <th rowspan="3" class="align-middle">TABELA</th>
+            <th rowspan="3" class="align-middle" style="text-align: center;">
+              VIGÊNCIA
+            </th>
+            <th rowspan="3" class="align-middle" style="text-align: center;">
+              PRAZO
+            </th>
+            <th colspan="3" class="align-middle" style="text-align: center;">
+              SISTEMA
+            </th>
+            <th colspan="4" class="align-middle" style="text-align: center">
+              COMISSÃO
+            </th>            
+          </tr>
+
+          <tr style="font-size: 0.8em;">
+            <th rowspan="2" class="align-middle" style="text-align: center;">
+              Total
+            </th>
+            <th rowspan="2" class="align-middle" style="text-align: center;">
+              Líquido
+            </th>
+            <th rowspan="2" class="align-middle" style="text-align: center;">
+              Bruto
+            </th>
+            <th colspan="2" style="text-align: center;">Líquido</th>
+            <th colspan="2" style="text-align: center;">Bruto</th>
+          </tr>
+
+          <tr style="font-size: 0.8em;">
+            <th style="text-align: center;">Agente</th>
+            <th style="text-align: center;">Corresp.</th>
+            <th style="text-align: center;">Agente</th>
+            <th style="text-align: center;">Corresp.</th>
+          </tr>
+
+          <tr style="font-size: 0.8em;" *ngFor="let tabela of tabelas">
+            <td>{{ tabela.codigo_mg }}</td>
+            <td>{{ tabela.banco }}</td>
+            <td>{{ tabela.convenio }}</td>
+            <td>{{ tabela.tipo }}</td>
+            <td>{{ tabela.tabela }}</td>
+            <td style="text-align: center;">
+              {{ tabela.vigencia | date: "dd/MM/yyyy" }}
+            </td>
+            <td style="text-align: center;">{{ tabela.prazo }}</td>
+            <td style="text-align: right">
+              {{ tabela.comissao_geral_sistema | number: "1.2-2" }}
+            </td>
+            <td style="text-align: right">
+              {{ tabela.comissao_liquido_sistema | number: "1.2-2" }}
+            </td>
+            <td style="text-align: right">
+              {{ tabela.comissao_bruto_sistema | number: "1.2-2" }}
+            </td>
+            <td style="text-align: right">
+              {{ tabela.comissao_liquido_agente | number: "1.2-2" }}
+            </td>
+            <td style="text-align: right">
+              {{ tabela.comissao_liquido_correspondente | number: "1.2-2" }}
+            </td>
+            <td style="text-align: right">
+              {{ tabela.comissao_bruto_agente | number: "1.2-2" }}
+            </td>
+            <td style="text-align: right">
+              {{ tabela.comissao_bruto_correspondente | number: "1.2-2" }}
+            </td>            
+          </tr>
+        </table>        
+      </div>
+    </div>
+  </div>
+</div>

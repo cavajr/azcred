@@ -1,0 +1,113 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-primary">
+      <div class="card-header">
+        <strong>{{ editando ? "Edição" : "Novo Registro" }}</strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="salvar(f)">
+        <div class="card-body">
+          <div class="form-group">
+            <label for="nome" class="control-label">Nome</label>
+            <input
+              [class.is-invalid]="nome.invalid && nome.touched"
+              id="nome"
+              type="text"
+              name="nome"
+              class="form-control"
+              required
+              [(ngModel)]="grupo.nome"
+              #nome="ngModel"
+              oninput="this.value = this.value.toUpperCase()"
+            />
+            <app-message
+              [control]="nome"
+              error="required"
+              text="O nome é obrigatório."
+            ></app-message>
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="descricao">Descrição</label>
+            <textarea
+              [class.is-invalid]="descricao.invalid && descricao.touched"
+              class="form-control"
+              style="resize: none;"
+              rows="3"
+              name="descricao"
+              required
+              [(ngModel)]="grupo.descricao"
+              #descricao="ngModel"
+              oninput="this.value = this.value.toUpperCase()"
+            ></textarea>
+            <app-message
+              [control]="descricao"
+              error="required"
+              text="A descrição é obrigatória."
+            ></app-message>
+          </div>
+          <div class="form-group">
+            <p-table
+              [columns]="cols"
+              [value]="permissoes"
+              [(selection)]="selecionados"
+              dataKey="id"
+            >
+              <ng-template pTemplate="caption">
+                Lista de Permissões
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <th style="width: 3em">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                  </th>
+                  <th>Nome</th>
+                  <th>Descrição</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rowData let-columns="columns">
+                <tr [pSelectableRow]="rowData">
+                  <td>
+                    <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+                  </td>
+                  <td *ngFor="let col of columns">
+                    {{ rowData[col.field] }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button
+            class="btn btn-sm btn-success"
+            type="submit"
+            [disabled]="f.invalid"
+          >
+            <i class="fa fa-save"></i>
+            Salvar
+          </button>
+          <button
+            class="btn btn-sm btn-primary"
+            type="button"
+            style="margin: 0 5px;"
+            (click)="novo(f)"
+          >
+            <i class="fa fa-plus-circle"></i>
+            Novo
+          </button>
+          <button
+            routerLink="/grupos"
+            class="btn btn-sm btn-outline-danger"
+            [disabled]="!auth.temPermissao('VISUALIZAR_GRUPO')"
+          >
+            <i class="fa fa-times"></i>
+            Retornar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

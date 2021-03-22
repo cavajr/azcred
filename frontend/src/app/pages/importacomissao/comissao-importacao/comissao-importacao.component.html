@@ -1,0 +1,191 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Importação de Comissão</strong>
+      </div>
+      <form
+        [formGroup]="formulario"
+        autocomplete="off"
+        (ngSubmit)="salvar()"
+        class="form-vertical"
+        enctype="multipart/form-data"
+      >
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Selecione o Sistema</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      formulario.get('sistema').invalid &&
+                      formulario.get('sistema').touched
+                    "
+                    formControlName="sistema"
+                    [items]="sistemas"
+                    [bindLabel]="'label'"
+                    [bindValue]="'value'"
+                    name="sistema"
+                    [(ngModel)]="sistema"
+                    clearAllText="Limpar"
+                    required
+                  ></ng-select>
+                  <app-message
+                    [control]="formulario.get('sistema')"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label for="input-cliente">Banco</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      formulario.get('banco_id').invalid &&
+                      formulario.get('banco_id').touched
+                    "
+                    formControlName="banco_id"
+                    name="banco_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let banco of listaBancos"
+                      [value]="banco.id"
+                      [disabled]="banco.ativo == 'N'"
+                      >{{ banco.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="formulario.get('banco_id')"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label for="input-cliente">Convênio</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      formulario.get('convenio_id').invalid &&
+                      formulario.get('convenio_id').touched
+                    "
+                    formControlName="convenio_id"
+                    name="convenio_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let convenio of listaConvenios"
+                      [value]="convenio.id"
+                      [disabled]="convenio.ativo == 'N'"
+                      >{{ convenio.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="formulario.get('convenio_id')"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label for="input-cliente">Tipo de Contrato</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      formulario.get('tipo_id').invalid &&
+                      formulario.get('tipo_id').touched
+                    "
+                    formControlName="tipo_id"
+                    [items]="listaTipos"
+                    [bindLabel]="'label'"
+                    [bindValue]="'value'"
+                    name="tipo_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                  </ng-select>
+                  <app-message
+                    [control]="formulario.get('tipo_id')"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div
+                class="col-sm-12 col-md-12 col-xl-6"
+                *ngIf="formulario.get('sistema').value === 'BEVI' || formulario.get('sistema').value === 'A2'"
+              >
+                <div class="form-group">
+                  <label class="control-label">Mostrar por</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      formulario.get('mostrarPor').invalid &&
+                      formulario.get('mostrarPor').touched
+                    "
+                    formControlName="mostrarPor"
+                    [searchable]="false"
+                    [clearable]="false"
+                    name="mostrarPor"
+                    required
+                  >
+                    <ng-option [value]="'L'">LÍQUIDO</ng-option>
+                    <ng-option [value]="'B'">BRUTO</ng-option>
+                  </ng-select>
+                  <app-message
+                    [control]="formulario.get('mostrarPor')"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label>Arquivo de importação</label>
+                  <input
+                    class="form-control"
+                    (change)="selecionaImagem($event.target.files[0])"
+                    type="file"
+                    formControlName="arquivo"
+                    name="arquivo"
+                    accept=".xlsx"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-sm btn-primary "
+              [disabled]="!formulario.valid"
+            >
+              <i class="fa fa-upload"></i>
+              Importar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

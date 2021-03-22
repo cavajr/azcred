@@ -1,0 +1,98 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header">
+        <strong>Corretor: {{ promotor }}</strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="salvar(f)">
+        <div class="card-body">
+          <p-table
+          [responsive]="false"
+          [value]="contratos"
+          [(selection)]="selecionados"
+          [scrollable]="true"
+          [style]="{ width: 'auto' }"
+          dataKey="id"
+        >
+          <ng-template pTemplate="caption">
+            Lista de Contratos do Lote: {{ lote }}
+          </ng-template>
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col style="width: 3em" />
+            <col style="width:130px" />
+            CPF
+            <col style="width:400px" />
+            Cliente
+            <col style="width:120px" />
+            Dt Operação
+            <col style="width:250px" />
+            Banco
+            <col style="width:120px" />
+            Dt Crédito
+            <col style="width:120px" />
+            NCR
+            <col style="width:200px" />
+            Usuário
+            <col style="width:120px" />
+            Valor R$
+            </colgroup>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3em"></th>
+            <th>CPF</th>
+            <th>Cliente</th>
+            <th>Dt Operação</th>
+            <th>Banco</th>
+            <th>Dt Crédito</th>
+            <th>NCR</th>
+            <th>Usuário</th>
+            <th>Valor R$</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData>
+            <tr [pSelectableRow]="rowData">
+              <td>
+                <p-tableCheckbox
+                  [value]="rowData"
+                  [disabled]="rowData.recebido === 1"
+                ></p-tableCheckbox>
+              </td>
+              <td>{{ rowData.cpf }}</td>
+              <td>{{ rowData.cliente }}</td>
+              <td>{{ rowData.data_operacao | date: "dd/MM/yyyy" }}</td>
+              <td>{{ rowData.banco }}</td>
+              <td>{{ rowData.data_credito_cliente | date: "dd/MM/yyyy" }}</td>
+              <td>{{ rowData.data_ncr | date: "dd/MM/yyyy" }}</td>
+              <td>{{ rowData.usuario }}</td>
+              <td style="text-align: right">
+                {{ rowData.valor_contrato | number: "1.2-2" }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        </div>
+        <div class="card-footer">
+          <button
+            class="btn  btn-success"
+            type="submit"
+            [disabled]="!selecionados"
+          >
+            <i class="fa  fa-save"></i>
+            <span class="hidden-xs  hidden-sm"> Receber</span>
+          </button>
+
+          <button
+            routerLink="/remessas"
+            class="btn btn-link"
+            [disabled]="!auth.temPermissao('VISUALIZAR_REMESSA')"
+          >
+            Pesquisa de protocolo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

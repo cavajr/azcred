@@ -1,0 +1,114 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header"><strong>Filtros</strong></div>
+      <form autocomplete="off" (ngSubmit)="pesquisar()">
+        <div class="card-body">
+          <div class="form-group">
+            <label for="input-nome">Nome</label>
+            <input
+              type="text"
+              class="form-control"
+              id="input-nome"
+              placeholder="Digite o nome"
+              name="nome"
+              [(ngModel)]="filtro.nome"
+            />
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm btn-outline-success" type="submit">
+            <i class="fa fa-search-plus"></i> Pesquisar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Listagem</strong>
+        <button
+          routerLink="/tipos/novo"
+          class="btn btn-sm btn-primary botao-card-direito"
+          [disabled]="!auth.temPermissao('CADASTRAR_TIPO_CONTRATO')"
+        >
+          <i class="fa fa-plus"></i> Novo
+        </button>
+      </div>
+      <div class="card-body">
+        <p-table
+          [value]="tipos"
+          [responsive]="true"
+          [paginator]="true"
+          [rows]="filtro.itensPorPagina"
+          [lazy]="true"
+          [loading]="loading"
+          [totalRecords]="totalRegistros"
+          (onLazyLoad)="aoMudarPagina($event)"
+          #tabela
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3em"></th>
+              <th style="width: 90%">Nome</th>
+              <th style="width: 20%; text-align: center;">Ações</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-tipo>
+            <tr>
+              <td style="width: 3em">
+                <span
+                  *ngIf="tipo.ativo == 'S'"
+                  class="badge badge-pill badge-success"
+                  ><i class="fa fa-check"></i
+                ></span>
+                <span
+                  *ngIf="tipo.ativo == 'N'"
+                  class="badge badge-pill badge-danger"
+                  ><i class="fa fa-close"></i
+                ></span>
+              </td>
+              <td>{{ tipo.nome }}</td>
+              <td style="width: 20%; text-align: center;">
+                <button
+                  pButton
+                  class="ui-button-warning"
+                  icon="pi pi-pencil"
+                  pTooltip="Editar"
+                  tooltipPosition="top"
+                  [routerLink]="['/tipos', tipo.id]"
+                  [disabled]="!auth.temPermissao('CADASTRAR_TIPO_CONTRATO')"
+                ></button>
+
+                <button
+                  pButton
+                  style="margin-left: 5px"
+                  class="ui-button-danger"
+                  icon="pi pi-trash"
+                  pTooltip="Excluir"
+                  tooltipPosition="top"
+                  (click)="confirmarExclusao(tipo)"
+                  [disabled]="
+                    !auth.temPermissao('EXCLUIR_TIPO_CONTRATO') ||
+                    tipo.id === null
+                  "
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="3">Nenhum tipo de contrato encontrado</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

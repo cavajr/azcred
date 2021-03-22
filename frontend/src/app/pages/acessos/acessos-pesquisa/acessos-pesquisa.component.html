@@ -1,0 +1,366 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header"><strong>Filtros</strong></div>
+      <form autocomplete="off" (ngSubmit)="pesquisar()">
+        <div class="card-body">
+          <div class="form-group">
+            <label for="input-nome">Banco</label>
+            <input
+              type="text"
+              class="form-control"
+              id="input-nome"
+              placeholder="Digite o nome"
+              name="banco"
+              [(ngModel)]="filtro.banco"
+            />
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm btn-outline-success" type="submit">
+            <i class="fa fa-search-plus"></i> Pesquisar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Listagem</strong>
+        <button
+          (click)="novo($event)"
+          class="btn btn-sm btn-primary botao-card-direito"
+          [disabled]="auth.isCorretor()"
+        >
+          <i class="fa fa-plus"></i> Novo
+        </button>
+      </div>
+      <div class="card-body">
+        <p-table
+          [value]="acessos"
+          [responsive]="true"
+          [paginator]="true"
+          [rows]="filtro.itensPorPagina"
+          [lazy]="true"
+          [loading]="loading"
+          [totalRecords]="totalRegistros"
+          (onLazyLoad)="aoMudarPagina($event)"
+          expandableRows="true"
+          dataKey="id"
+          rowExpandMode="single"
+          [scrollable]="true"
+          [style]="{ width: 'auto' }"
+          #tabela
+        >
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col style="width: 3em" />
+              <col style="width:400px" />
+              Banco
+              <col style="width:400px" />
+              Empréstimo
+              <col style="text-align: center; width: 120px" />
+              Ações
+            </colgroup>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3em"></th>
+              <th>Banco</th>
+              <th>Empréstimo</th>
+              <th style="text-align: center; width: 120px">Ações</th>
+            </tr>
+          </ng-template>
+
+          <ng-template
+            pTemplate="body"
+            let-acesso
+            let-rowData
+            let-expanded="expanded"
+          >
+            <tr>
+              <td>
+                <a href="#" [pRowToggler]="rowData">
+                  <i
+                    [ngClass]="
+                      expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'
+                    "
+                  ></i>
+                </a>
+              </td>
+              <td>{{ acesso.banco }}</td>
+              <td>{{ acesso.emprestimo }}</td>
+              <td style="width: 120px; text-align: center;">
+                <button
+                  pButton
+                  class="ui-button-warning"
+                  icon="pi pi-pencil"
+                  pTooltip="Editar"
+                  tooltipPosition="top"
+                  (click)="editar($event, acesso)"
+                  [disabled]="auth.isCorretor()"
+                ></button>
+                <button
+                  pButton
+                  style="margin-left: 5px"
+                  class="ui-button-danger"
+                  icon="pi pi-trash"
+                  pTooltip="Excluir"
+                  tooltipPosition="top"
+                  (click)="confirmarExclusao(acesso)"
+                  [disabled]="auth.isCorretor()"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="rowexpansion" let-i="rowIndex" let-acesso>
+            <tr>
+              <td colspan="4">
+                <div class="ui-g ui-fluid" style="font-size:12px;padding:10px">
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Login: </b> {{ acesso.login }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Senha: </b> {{ acesso.senha }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Link: </b>
+                    <a [href]="acesso.link" target="_blank">
+                      {{ acesso.link }}</a
+                    >
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4">Nenhum registro encontrado</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="" [ngClass]="oculto" *ngIf="acesso">
+  <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #23282c">
+          <h5 class="modal-title text-white">
+            {{ editando ? "Edição" : "Novo Registro" }}
+          </h5>
+          <button
+            (click)="oculto = 'oculto'"
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            ×
+          </button>
+        </div>
+        <form #frm="ngForm" (ngSubmit)="confirmar(frm)">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="nome" class="control-label">Banco</label>
+                  <input
+                    id="nome"
+                    type="text"
+                    name="banco"
+                    class="form-control"
+                    [class.is-invalid]="banco.invalid && banco.touched"
+                    required
+                    [(ngModel)]="acesso.banco"
+                    #banco="ngModel"
+                    minlength="3"
+                    maxlength="200"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="banco"
+                    error="required"
+                    text="O banco é obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="banco"
+                    error="minlength"
+                    text="Mínimo de 3 caracteres"
+                  ></app-message>
+                  <app-message
+                    [control]="banco"
+                    error="maxlength"
+                    text="Mínimo de 200 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Empréstimo</label>
+                  <input
+                    type="text"
+                    name="emprestimo"
+                    class="form-control"
+                    [class.is-invalid]="
+                      emprestimo.invalid && emprestimo.touched
+                    "
+                    required
+                    [(ngModel)]="acesso.emprestimo"
+                    #emprestimo="ngModel"
+                    minlength="3"
+                    maxlength="200"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="emprestimo"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="emprestimo"
+                    error="minlength"
+                    text="Mínimo de 3 caracteres"
+                  ></app-message>
+                  <app-message
+                    [control]="emprestimo"
+                    error="maxlength"
+                    text="Mínimo de 200 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="control-label">Login</label>
+                  <input
+                    type="text"
+                    name="login"
+                    class="form-control"
+                    [class.is-invalid]="login.invalid && login.touched"
+                    required
+                    [(ngModel)]="acesso.login"
+                    #login="ngModel"
+                    minlength="3"
+                    maxlength="50"
+                  />
+                  <app-message
+                    [control]="login"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="login"
+                    error="minlength"
+                    text="Mínimo de 3 caracteres"
+                  ></app-message>
+                  <app-message
+                    [control]="login"
+                    error="maxlength"
+                    text="Mínimo de 50 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="control-label">Senha</label>
+                  <input
+                    type="text"
+                    name="senha"
+                    class="form-control"
+                    [class.is-invalid]="senha.invalid && senha.touched"
+                    required
+                    [(ngModel)]="acesso.senha"
+                    #senha="ngModel"
+                    minlength="3"
+                    maxlength="50"
+                  />
+                  <app-message
+                    [control]="senha"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="senha"
+                    error="minlength"
+                    text="Mínimo de 3 caracteres"
+                  ></app-message>
+                  <app-message
+                    [control]="senha"
+                    error="maxlength"
+                    text="Mínimo de 50 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Link</label>
+                  <input
+                    type="text"
+                    name="link"
+                    class="form-control"
+                    [class.is-invalid]="link.invalid && link.touched"
+                    required
+                    [(ngModel)]="acesso.link"
+                    #link="ngModel"
+                    minlength="3"
+                    maxlength="255"
+                    oninput="this.value = this.value.toLowerCase()"
+                  />
+                  <app-message
+                    [control]="link"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="link"
+                    error="minlength"
+                    text="Mínimo de 3 caracteres"
+                  ></app-message>
+                  <app-message
+                    [control]="link"
+                    error="maxlength"
+                    text="Mínimo de 255 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              (click)="oculto = 'oculto'; frm.reset()"
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-sm btn-success"
+              [disabled]="frm.invalid"
+            >
+              <i class="fa fa-save"></i>
+              <span class="hidden-xs  hidden-sm"> Salvar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

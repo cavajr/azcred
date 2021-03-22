@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<design>
+    <page>
+        <format>a4</format>
+        <orientation>P</orientation>
+    </page>
+    <rectangle id="1">
+        <class>Rectangle</class>
+        <x>16</x>
+        <y>136</y>
+        <width>324</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="2">
+        <class>Text</class>
+        <x>192</x>
+        <y>34</y>
+        <font>Arial</font>
+        <size>14</size>
+        <text>&lt;b&gt;FICHA CADASTRAL DE CLIENTE&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <line id="3">
+        <class>Line</class>
+        <x>16</x>
+        <y>58</y>
+        <x2>566</x2>
+        <y2>58</y2>
+        <linewidth>0.5</linewidth>
+        <linecolor>#000000</linecolor>
+    </line>
+    <rectangle id="4">
+        <class>Rectangle</class>
+        <x>16</x>
+        <y>104</y>
+        <width>78</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="5">
+        <class>Text</class>
+        <x>248</x>
+        <y>76</y>
+        <font>Arial</font>
+        <size>10</size>
+        <text>&lt;b&gt;DADOS DO CLIENTE&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="6">
+        <class>Text</class>
+        <x>18</x>
+        <y>109</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;CPF&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="7">
+        <class>Rectangle</class>
+        <x>94</x>
+        <y>104</y>
+        <width>398</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="8">
+        <class>Rectangle</class>
+        <x>492</x>
+        <y>104</y>
+        <width>74</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="9">
+        <class>Text</class>
+        <x>96</x>
+        <y>109</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;CLIENTE&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="10">
+        <class>Text</class>
+        <x>494</x>
+        <y>109</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;DATA NASCIMENTO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="11">
+        <class>Rectangle</class>
+        <x>16</x>
+        <y>120</y>
+        <width>476</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="12">
+        <class>Rectangle</class>
+        <x>492</x>
+        <y>120</y>
+        <width>74</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="13">
+        <class>Text</class>
+        <x>18</x>
+        <y>125</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;ENDEREÇO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="14">
+        <class>Text</class>
+        <x>34</x>
+        <y>114</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{cpf}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="15">
+        <class>Text</class>
+        <x>512</x>
+        <y>114</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{data_nasc}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="16">
+        <class>Text</class>
+        <x>120</x>
+        <y>114</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{cliente}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="17">
+        <class>Text</class>
+        <x>494</x>
+        <y>125</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;NÚMERO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="18">
+        <class>Text</class>
+        <x>517</x>
+        <y>129</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{numero}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="19">
+        <class>Text</class>
+        <x>52</x>
+        <y>129</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{endereco}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="20">
+        <class>Rectangle</class>
+        <x>340</x>
+        <y>136</y>
+        <width>226</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="21">
+        <class>Text</class>
+        <x>18</x>
+        <y>141</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;COMPLEM&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="22">
+        <class>Text</class>
+        <x>344</x>
+        <y>141</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;BAIRRO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="23">
+        <class>Rectangle</class>
+        <x>16</x>
+        <y>152</y>
+        <width>320</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="24">
+        <class>Rectangle</class>
+        <x>336</x>
+        <y>152</y>
+        <width>26</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="25">
+        <class>Rectangle</class>
+        <x>362</x>
+        <y>152</y>
+        <width>54</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="26">
+        <class>Rectangle</class>
+        <x>416</x>
+        <y>152</y>
+        <width>54</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="27">
+        <class>Rectangle</class>
+        <x>470</x>
+        <y>152</y>
+        <width>54</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="28">
+        <class>Rectangle</class>
+        <x>524</x>
+        <y>152</y>
+        <width>42</width>
+        <height>16</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="29">
+        <class>Text</class>
+        <x>18</x>
+        <y>157</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;CIDADE&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="30">
+        <class>Text</class>
+        <x>338</x>
+        <y>157</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;UF&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="31">
+        <class>Text</class>
+        <x>364</x>
+        <y>157</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;CEP&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="32">
+        <class>Text</class>
+        <x>416</x>
+        <y>157</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;IDENTIDADE&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="33">
+        <class>Text</class>
+        <x>470</x>
+        <y>157</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;RG/ÓRGÃO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="34">
+        <class>Text</class>
+        <x>526</x>
+        <y>157</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;RG/UF&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <rectangle id="35">
+        <class>Rectangle</class>
+        <x>16</x>
+        <y>168</y>
+        <width>200</width>
+        <height>58</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <rectangle id="36">
+        <class>Rectangle</class>
+        <x>216</x>
+        <y>168</y>
+        <width>350</width>
+        <height>58</height>
+        <fillcolor>#FFFFFF</fillcolor>
+        <linecolor>#000000</linecolor>
+        <linewidth>0.5</linewidth>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </rectangle>
+    <text id="37">
+        <class>Text</class>
+        <x>18</x>
+        <y>176</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;TELEFONES&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="38">
+        <class>Text</class>
+        <x>218</x>
+        <y>176</y>
+        <font>Arial</font>
+        <size>5</size>
+        <text>&lt;b&gt;OBSERVAÇÃO&lt;/b&gt;</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="39">
+        <class>Text</class>
+        <x>52</x>
+        <y>145</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{complem}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="40">
+        <class>Text</class>
+        <x>370</x>
+        <y>145</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{bairro}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="41">
+        <class>Text</class>
+        <x>52</x>
+        <y>161</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{cidade}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="42">
+        <class>Text</class>
+        <x>346</x>
+        <y>161</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{uf}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="43">
+        <class>Text</class>
+        <x>376</x>
+        <y>161</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{cep}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="44">
+        <class>Text</class>
+        <x>432</x>
+        <y>161</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{identidade}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="45">
+        <class>Text</class>
+        <x>484</x>
+        <y>161</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{rg_orgao}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="46">
+        <class>Text</class>
+        <x>540</x>
+        <y>161</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{rg_uf}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="47">
+        <class>Text</class>
+        <x>50</x>
+        <y>186</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{telefones}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+    <text id="48">
+        <class>Text</class>
+        <x>256</x>
+        <y>186</y>
+        <font>Arial</font>
+        <size>6</size>
+        <text>{obs}</text>
+        <color>#000000</color>
+        <shadowoffset>0</shadowoffset>
+        <shadowcolor>#000000</shadowcolor>
+    </text>
+</design>

@@ -1,0 +1,131 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header"><strong>Filtros</strong></div>
+      <form autocomplete="off" (ngSubmit)="pesquisar()">
+        <div class="card-body">
+          <div class="row">
+            <div class="form-group col-sm-6">
+              <label>Tipo</label>
+              <ng-select
+                [(ngModel)]="filtro.tipo"
+                [items]="tipos"
+                name="tipo"
+                clearAllText="Limpar"
+                [bindLabel]="'label'"
+                [bindValue]="'value'"
+                loadingText="Carregando..."
+                notFoundText="Nenhum registro encontrado"
+              >
+              </ng-select>
+            </div>
+            <div class="form-group col-sm-6">
+              <label>De</label>
+              <input class="form-control" placeholder="Data" bsDatepicker [bsConfig]="bsConfig" [(ngModel)]="filtro.data_mov" name="data_mov" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12 form-group">
+              <label for="input-nome">Nome</label>
+              <input type="text" class="form-control" id="input-nome" placeholder="Digite o nome" name="nome" [(ngModel)]="filtro.nome" />
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm btn-outline-success" type="submit"><i class="fa fa-search-plus"></i> Pesquisar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Listagem</strong>
+        <button
+          routerLink="/financeiro/novo"
+          class="btn btn-sm btn-primary botao-card-direito"
+          [disabled]="!auth.temPermissao('CADASTRAR_LANCAMENTO')"
+        >
+          <i class="fa fa-plus"></i> Novo
+        </button>
+      </div>
+      <div class="card-body">
+        <p-table
+          [value]="financeiros"
+          [responsive]="true"
+          [paginator]="true"
+          [rows]="filtro.itensPorPagina"
+          [lazy]="true"
+          [loading]="loading"
+          [totalRecords]="totalRegistros"
+          (onLazyLoad)="aoMudarPagina($event)"
+          #tabela
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="text-align: center">Tipo</th>
+              <th style="text-align: center">Data</th>
+              <th style="text-align: left">Nome</th>
+              <th style="text-align: center">Valor</th>
+              <th style="width: 15%; text-align: center;">Ações</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-financeiro>
+            <tr>
+              <td *ngIf="financeiro.tipo == 1">
+                {{ "Receita" }}
+              </td>
+              <td *ngIf="financeiro.tipo == 2">
+                {{ "Despesa" }}
+              </td>
+              <td style="text-align: center">
+                {{ financeiro.data_mov | date: "dd/MM/yyyy" }}
+              </td>
+              <td>
+                <span class="ui-column-title">Nome</span>
+                {{ financeiro.nome }}
+              </td>
+              <td [style.color]="financeiro.tipo === 2 ? 'red' : 'blue'" style="text-align: right">
+                {{ financeiro.valor | number: "1.2-2" }}
+              </td>
+              <td style="width: 15%; text-align: center;">
+                <button
+                  pButton
+                  class="ui-button-warning"
+                  icon="pi pi-pencil"
+                  pTooltip="Editar"
+                  tooltipPosition="top"
+                  [routerLink]="['/financeiro', financeiro.id]"
+                  [disabled]="!auth.temPermissao('CADASTRAR_LANCAMENTO')"
+                ></button>
+
+                <button
+                  pButton
+                  style="margin-left: 5px"
+                  class="ui-button-danger"
+                  icon="pi pi-trash"
+                  pTooltip="Excluir"
+                  tooltipPosition="top"
+                  (click)="confirmarExclusao(financeiro)"
+                  [disabled]="!auth.temPermissao('EXCLUIR_LANCAMENTO')"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5">
+                Nenhum lançamento encontrado
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

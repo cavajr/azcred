@@ -1,0 +1,104 @@
+<div class="row animated fadeIn">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header"><strong>Relatório Financeiro</strong></div>
+      <form
+        [formGroup]="formulario"
+        autocomplete="off"
+        (ngSubmit)="gerar()"
+        class="form-vertical"
+      >
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Tipo</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      formulario.get('tipo').invalid &&
+                      formulario.get('tipo').touched
+                    "
+                    formControlName="tipo"
+                    [items]="tipos"
+                    name="tipo"
+                    required
+                    clearAllText="Limpar"
+                    [bindLabel]="'label'"
+                    [bindValue]="'value'"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                  </ng-select>
+                  <app-message
+                    [control]="formulario.get('tipo')"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>De</label>
+                  <input
+                    [class.is-invalid]="
+                      formulario.get('de').invalid &&
+                      formulario.get('de').touched
+                    "
+                    class="form-control"
+                    placeholder="De"
+                    bsDatepicker
+                    [bsConfig]="bsConfig"
+                    formControlName="de"
+                    name="de"
+                    required
+                  />
+                  <app-message
+                    [control]="formulario.get('de')"
+                    error="required"
+                    text="A data inicial é obrigatória."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="form-group">
+                  <label>Até</label>
+                  <input
+                    [class.is-invalid]="
+                      formulario.get('ate').invalid &&
+                      formulario.get('ate').touched
+                    "
+                    class="form-control"
+                    placeholder="Até"
+                    bsDatepicker
+                    [bsConfig]="bsConfig"
+                    formControlName="ate"
+                    name="ate"
+                    required
+                  />
+                  <app-message
+                    [control]="formulario.get('ate')"
+                    error="required"
+                    text="A data final é obrigatória."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button
+            type="submit"
+            class="btn btn-sm btn-success"
+            [disabled]="!formulario.valid"
+          >
+            <i class="fa fa-print"></i>
+            Imprimir
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

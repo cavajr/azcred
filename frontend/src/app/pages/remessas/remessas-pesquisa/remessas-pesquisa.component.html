@@ -1,0 +1,104 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header"><strong>Filtros</strong></div>
+      <form autocomplete="off" (ngSubmit)="pesquisar()">
+        <div class="card-body">
+          <div class="row">
+          <div class="col-sm-8">
+            <div class="form-group">
+              <label for="input-corretor">Corretor</label>
+              <ng-select [(ngModel)]="filtro.corretor" [items]="listaCorretores" name="corretor" required
+                clearAllText="Limpar" [bindLabel]="'label'" [bindValue]="'value'" loadingText="Carregando..."
+                notFoundText="Nenhum registro encontrado"></ng-select>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group">
+              <label for="input-contrato">Status</label>
+              <ng-select [(ngModel)]="filtro.status" [items]="listaStatus" name="status" required clearAllText="Limpar"
+                [bindLabel]="'label'" [bindValue]="'value'" loadingText="Carregando..."
+                notFoundText="Nenhum registro encontrado"></ng-select>
+            </div>
+          </div>
+        </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm btn-outline-success" type="submit">
+            <i class="fa fa-search-plus"></i> Pesquisar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Listagens de Protocolo</strong>
+      </div>
+      <div class="card-body">
+        <p-table [value]="remessas" [responsive]="true" [paginator]="true" [rows]="filtro.itensPorPagina" [lazy]="true"
+          [loading]="loading" [totalRecords]="totalRegistros" (onLazyLoad)="aoMudarPagina($event)" #tabela>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 10%">Lote</th>
+              <th style="width: 15%">Envio</th>
+              <th style="width: 50%">Corretor</th>
+              <th style="width: 15%">Status</th>
+              <th style="width: 15%">Recebimento</th>
+              <th style="width: 25%; text-align: center;">Ações</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-remessa>
+            <tr>
+              <td style="text-align: right;">
+                {{ remessa.id }}
+              </td>
+              <td style="text-align: center;">
+                {{ remessa.data_remessa | date: "dd/MM/yyyy" }}
+              </td>
+              <td>
+                {{ remessa.corretor }}
+              </td>
+              <td>
+                {{ remessa.status }}
+              </td>
+              <td style="text-align: center;">
+                {{ remessa.data_recebido | date: "dd/MM/yyyy" }}
+              </td>
+              <td style="width: 25%; text-align: center;">
+                <button pButton class="ui-button-success" icon="pi pi-download" pTooltip="Receber" tooltipPosition="top" *ngIf="remessa.status_id !==2"
+                  [routerLink]="['/remessas', remessa.id]" [disabled]="!auth.temPermissao('RECEBER_REMESSA')"></button>
+
+                <button *ngIf="remessa.status_id !== 1" pButton style="margin-left: 5px" class="ui-button-primary"
+                  icon="pi pi-print" pTooltip="Imprimir" tooltipPosition="top" (click)="gerar(remessa)"
+                  [disabled]="!auth.temPermissao('IMPRIMIR_REMESSA')"></button>
+
+                <button pButton style="margin-left: 5px" class="ui-button-danger" icon="pi pi-trash" pTooltip="Excluir"
+                  tooltipPosition="top" (click)="confirmarExclusao(remessa)"
+                  [disabled]="!auth.temPermissao('EXCLUIR_REMESSA')"></button>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6">
+                Nenhum protocolo encontrado
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+

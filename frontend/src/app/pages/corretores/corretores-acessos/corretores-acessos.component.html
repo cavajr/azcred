@@ -1,0 +1,277 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>
+          Edição
+        </strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="salvar(f)">
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label for="nome" class="control-label">Nome</label>
+                  <input
+                    type="text"
+                    name="nome"
+                    class="form-control"
+                    [(ngModel)]="corretor.nome"
+                    #nome="ngModel"
+                    disabled="true"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="cpf-cli" class="control-label">CPF</label>
+                  <input
+                    id="cpf-cli"
+                    type="text"
+                    name="cpf"
+                    disabled="true"
+                    [(ngModel)]="corretor.cpf"
+                    #cpf="ngModel"
+                    mask="000.000.000-00"
+                    [dropSpecialCharacters]="false"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <div class="card border-success">
+                  <div class="card-header">
+                    <strong>Dados de Acesso</strong>
+                    <button
+                      (click)="prepararNovaConta($event)"
+                      class="btn btn-sm btn-primary botao-card-direito"
+                    >
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </div>
+                  <div class="card-body">
+                    <p-table
+                      [value]="acessos"
+                      [responsive]="true"
+                      [paginator]="true"
+                      [rows]="10"
+                      #tabBanco
+                    >
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th>Banco/Sistema</th>
+                          <th>Usuário</th>
+                          <th>Senha</th>
+                          <th>Código Agente</th>
+                          <th>Operador</th>
+                          <th style="width: 120px; text-align: center;">
+                            Ações
+                          </th>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template
+                        pTemplate="body"
+                        let-acesso
+                        let-rowIndex="rowIndex"
+                      >
+                        <tr>
+                          <td>{{ acesso.banco }}</td>
+                          <td>{{ acesso.usuario }}</td>
+                          <td>{{ acesso.senha }}</td>
+                          <td>{{ acesso.codigo_agente }}</td>
+                          <td>{{ acesso.operador }}</td>
+                          <td style="width: 120px; text-align: center;">
+                            <button
+                              pButton
+                              style="margin-left: 5px"
+                              icon="fa fa-pencil"
+                              type="button"
+                              pTooltip="Editar"
+                              tooltipPosition="top"
+                              (click)="prepararEdicaoConta(acesso, rowIndex)"
+                            ></button>
+                            <button
+                              pButton
+                              style="margin-left: 5px"
+                              class="ui-button-danger"
+                              icon="pi pi-trash"
+                              pTooltip="Excluir"
+                              tooltipPosition="top"
+                              (click)="removerConta(rowIndex)"
+                            ></button>
+                          </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td colspan="6">Nenhum registro encontrado</td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="form-actions">
+            <div class="col-md-12">
+              <div class="row">
+                <button class="btn btn-sm  btn-success" type="submit">
+                  <i class="fa  fa-save"></i>
+                  <span class="hidden-xs  hidden-sm"> Salvar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="" [ngClass]="oculto" *ngIf="corretorAcesso">
+  <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #23282c">
+          <h5 class="modal-title text-white">
+            {{ editandoConta ? "Edição de Acesso" : "Novo Acesso" }}
+          </h5>
+          <button
+            (click)="oculto = 'oculto'"
+            type="button"
+            class="close"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form #frmConta="ngForm" (ngSubmit)="confirmarConta(frmConta)">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Banco/Sistema</label>
+                  <input
+                    [class.is-invalid]="banco.invalid && banco.touched"
+                    class="form-control"
+                    type="text"
+                    name="banco"
+                    maxlength="30"
+                    required
+                    [(ngModel)]="corretorAcesso.banco"
+                    #banco="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="banco"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="banco"
+                    error="maxlength"
+                    text="Máximo de 30 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Usuário</label>
+                  <input
+                    [class.is-invalid]="usuario.invalid && usuario.touched"
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="usuario"
+                    required
+                    [(ngModel)]="corretorAcesso.usuario"
+                    #usuario="ngModel"
+                  />
+                  <app-message
+                    [control]="usuario"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Senha</label>
+                  <input
+                    [class.is-invalid]="senha.invalid && senha.touched"
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="senha"
+                    required
+                    [(ngModel)]="corretorAcesso.senha"
+                    #senha="ngModel"
+                  />
+                  <app-message
+                    [control]="senha"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Código Agente</label>
+                  <input
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="codigo_agente"
+                    [(ngModel)]="corretorAcesso.codigo_agente"
+                    #codigo_agente="ngModel"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Operador</label>
+                  <input
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="operador"
+                    [(ngModel)]="corretorAcesso.operador"
+                    #operador="ngModel"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              (click)="oculto = 'oculto'; frmConta.reset()"
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-sm btn-success"
+              [disabled]="!frmConta.valid"
+            >
+              <i class="fa fa-save"></i> Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

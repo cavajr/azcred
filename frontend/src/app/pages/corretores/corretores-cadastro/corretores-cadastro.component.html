@@ -1,0 +1,754 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>
+          {{ editando ? "Edição" : "Novo Registro" }}
+        </strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="salvar(f)">
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="control-label">Código</label>
+                  <input
+                    [class.is-invalid]="id.invalid && id.touched"
+                    type="text"
+                    name="id"
+                    class="form-control"
+                    disabled
+                    [(ngModel)]="corretor.id"
+                    #id="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Ativo</label>
+                  <ng-select
+                    [class.is-invalid]="ativo.invalid && ativo.touched"
+                    [searchable]="false"
+                    #ativo="ngModel"
+                    required
+                    name="ativo"
+                    [(ngModel)]="corretor.ativo"
+                    [disabled]="!auth.temPermissao('EXCLUIR_CORRETOR')"
+                  >
+                    <ng-option [value]="'S'">SIM</ng-option>
+                    <ng-option [value]="'N'">NÃO</ng-option>
+                  </ng-select>
+                  <app-message
+                    [control]="ativo"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-10">
+                <div class="form-group">
+                  <label class="control-label">Perfil de Comissão</label>
+                  <ng-select
+                    [class.is-invalid]="perfil_id && perfil_id.touched"
+                    [(ngModel)]="corretor.perfil_id"
+                    #perfil_id="ngModel"
+                    name="perfil_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let perfil of perfis"
+                      [value]="perfil.id"
+                      [disabled]="perfil.ativo == 'N'"
+                      >{{ perfil.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="perfil_id"
+                    error="required"
+                    text="O Perfil é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Nome</label>
+                  <input
+                    [class.is-invalid]="nome.invalid && nome.touched"
+                    type="text"
+                    name="nome"
+                    class="form-control"
+                    required
+                    [(ngModel)]="corretor.nome"
+                    #nome="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="nome"
+                    error="required"
+                    text="O Nome é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <label class="control-label">Data de Nascimento</label>
+                <input
+                  class="form-control"
+                  placeholder="Selecione uma data"
+                  name="data_nasc"
+                  bsDatepicker
+                  [bsConfig]="bsConfig"
+                  [(ngModel)]="corretor.data_nasc"
+                  #data_nasc="ngModel"
+                />
+              </div>
+              <div class="col-md-9">
+                <div class="form-group">
+                  <label class="control-label">E-mail</label>
+                  <input
+                    [class.is-invalid]="email.invalid && email.touched"
+                    type="text"
+                    name="email"
+                    class="form-control"
+                    [(ngModel)]="corretor.email"
+                    #email="ngModel"
+                    oninput="this.value = this.value.toLowerCase()"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <label class="control-label">Pessoa</label>
+                <ng-select
+                  [class.is-invalid]="pessoa && pessoa.touched"
+                  (change)="onChange($event)"
+                  [searchable]="false"
+                  [clearable]="false"
+                  [items]="pessoas"
+                  [bindLabel]="'label'"
+                  [bindValue]="'value'"
+                  name="pessoa"
+                  [(ngModel)]="corretor.pessoa"
+                  #pessoa="ngModel"
+                  required
+                >
+                </ng-select>
+                <app-message
+                  [control]="pessoa"
+                  error="required"
+                  text="Campo obrigatório."
+                ></app-message>
+              </div>
+              <div class="col-md-4" *ngIf="corretor.pessoa === 'F'">
+                <div class="form-group">
+                  <label class="control-label">CPF</label>
+                  <input
+                    [class.is-invalid]="cpf.invalid && cpf.touched"
+                    type="text"
+                    name="cpf"
+                    required
+                    [(ngModel)]="corretor.cpf"
+                    #cpf="ngModel"
+                    mask="000.000.000-00"
+                    [dropSpecialCharacters]="false"
+                    class="form-control"
+                  />
+                  <app-message
+                    [control]="cpf"
+                    error="required"
+                    text="O CPF/CNPJ é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-4" *ngIf="corretor.pessoa === 'J'">
+                <div class="form-group">
+                  <label class="control-label">CNPJ</label>
+                  <input
+                    [class.is-invalid]="cpf.invalid && cpf.touched"
+                    type="text"
+                    name="cpf"
+                    required
+                    [(ngModel)]="corretor.cpf"
+                    #cpf="ngModel"
+                    mask="00.000.000/0000-00"
+                    [dropSpecialCharacters]="false"
+                    class="form-control"
+                  />
+                  <app-message
+                    [control]="cpf"
+                    error="required"
+                    text="O CPF/CNPJ é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label for="data_admissao" class="control-label"
+                    >Data Admissão</label
+                  >
+                  <input
+                    class="form-control"
+                    placeholder="Selecione uma data"
+                    name="data_admissao"
+                    bsDatepicker
+                    [bsConfig]="bsConfig"
+                    [(ngModel)]="corretor.data_adm"
+                    #data_admissao="ngModel"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <h4 class="text-blue">Residência</h4>
+                <hr />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-10">
+                <div class="form-group">
+                  <label class="control-label" for="endereco">Endereço</label>
+                  <input
+                    class="form-control"
+                    name="endereco"
+                    [(ngModel)]="corretor.endereco"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="control-label" for="numero">Número</label>
+                  <input
+                    class="form-control"
+                    name="numero"
+                    [(ngModel)]="corretor.numero"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-5">
+                <div class="form-group">
+                  <label class="control-label" for="complem">Complemento</label>
+                  <input
+                    class="form-control"
+                    name="complem"
+                    [(ngModel)]="corretor.complem"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+              <div class="col-md-7">
+                <div class="form-group">
+                  <label class="control-label" for="bairro">Bairro</label>
+                  <input
+                    class="form-control"
+                    name="bairro"
+                    [(ngModel)]="corretor.bairro"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="control-label" for="cep">CEP</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="cep"
+                    name="cep"
+                    mask="00000-000"
+                    [dropSpecialCharacters]="false"
+                    [(ngModel)]="corretor.cep"
+                    #cep="ngModel"
+                  />
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="control-label" for="cidade">Cidade</label>
+                  <input
+                    class="form-control"
+                    name="cidade"
+                    [(ngModel)]="corretor.cidade"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="control-label" for="uf">UF</label>
+                  <ng-select
+                    id="uf"
+                    [items]="ufs"
+                    [bindLabel]="'label'"
+                    [bindValue]="'value'"
+                    name="uf"
+                    [(ngModel)]="corretor.uf"
+                    #uf="ngModel"
+                    clearAllText="Limpar"
+                  ></ng-select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="control-label" for="telefone">Telefones</label>
+                  <textarea
+                    class="form-control"
+                    rows="3"
+                    name="telefone"
+                    [(ngModel)]="corretor.telefone"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="control-label" for="obs">Observações</label>
+                  <textarea
+                    class="form-control"
+                    rows="3"
+                    name="obs"
+                    [(ngModel)]="corretor.obs"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <h4 class="text-blue">Dados Bancários</h4>
+                <hr />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label" for="bancopg_id">Banco</label>
+                  <ng-select
+                    [class.is-invalid]="bancopg_id && bancopg_id.touched"
+                    [(ngModel)]="corretor.bancopg_id"
+                    #bancopg_id="ngModel"
+                    name="bancopg_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let banco of bancos"
+                      [value]="banco.id"
+                      [disabled]="banco.ativo == 'N'"
+                      >{{ banco.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="bancopg_id"
+                    error="required"
+                    text="O Banco é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="control-label" for="agencia">Agência</label>
+                  <input
+                    class="form-control"
+                    name="agencia"
+                    [(ngModel)]="corretor.agencia"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="control-label" for="conta_numero">Conta</label>
+                  <input
+                    class="form-control"
+                    name="conta_numero"
+                    [(ngModel)]="corretor.conta_numero"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="control-label" for="conta_id"
+                    >Tipo de Conta</label
+                  >
+                  <ng-select
+                    [class.is-invalid]="conta_id && conta_id.touched"
+                    [(ngModel)]="corretor.conta_id"
+                    #conta_id="ngModel"
+                    name="conta_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let conta of contas"
+                      [value]="conta.id"
+                      [disabled]="conta.ativo == 'N'"
+                      >{{ conta.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="conta_id"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="control-label">Titular Conta</label>
+                  <input
+                    type="text"
+                    name="titular_conta"
+                    class="form-control"
+                    [(ngModel)]="corretor.titular_conta"
+                    #titular_conta="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="control-label">CPF/CNPJ Titular</label>
+                  <input
+                    type="text"
+                    name="cpf_titular"
+                    maxlength='18'
+                    [(ngModel)]="corretor.cpf_titular"
+                    #cpf_titular="ngModel"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Chave PIX</label>
+                  <input
+                    [class.is-invalid]="pix.invalid && pix.touched"
+                    maxlength="100"
+                    class="form-control"
+                    type="text"
+                    name="pix"
+                    [(ngModel)]="corretor.pix"
+                    #pix="ngModel"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Tarifa</label>
+                  <input
+                    [class.is-invalid]="tarifa.invalid && tarifa.touched"
+                    min="0"
+                    max="100"
+                    required
+                    currencyMask
+                    [options]="{
+                      prefix: '',
+                      thousands: '.',
+                      decimal: ',',
+                      allowNegative: false
+                    }"
+                    class="form-control"
+                    type="text"
+                    name="tarifa"
+                    [(ngModel)]="corretor.tarifa"
+                    #tarifa="ngModel"
+                  />
+                  <app-message
+                    [control]="tarifa"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="tarifa"
+                    error="min"
+                    text="Valor mínimo é 0."
+                  ></app-message>
+                  <app-message
+                    [control]="tarifa"
+                    error="max"
+                    text="Valor máximo é 100."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <div class="card border-success">
+                  <div class="card-header">
+                    <strong>Dados de Acesso</strong>
+                    <button
+                      (click)="prepararNovaConta($event)"
+                      class="btn btn-sm btn-primary botao-card-direito"
+                    >
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </div>
+                  <div class="card-body">
+                    <p-table
+                      [value]="acessos"
+                      [responsive]="true"
+                      [paginator]="true"
+                      [rows]="10"
+                      #tabBanco
+                    >
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th>Banco/Sistema</th>
+                          <th>Usuário</th>
+                          <th>Senha</th>
+                          <th>Código Agente</th>
+                          <th>Operador</th>
+                          <th style="width: 120px; text-align: center;">
+                            Ações
+                          </th>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template
+                        pTemplate="body"
+                        let-acesso
+                        let-rowIndex="rowIndex"
+                      >
+                        <tr>
+                          <td>{{ acesso.banco }}</td>
+                          <td>{{ acesso.usuario }}</td>
+                          <td>{{ acesso.senha }}</td>
+                          <td>{{ acesso.codigo_agente }}</td>
+                          <td>{{ acesso.operador }}</td>
+                          <td style="width: 120px; text-align: center;">
+                            <button
+                              pButton
+                              style="margin-left: 5px"
+                              icon="fa fa-pencil"
+                              type="button"
+                              pTooltip="Editar"
+                              tooltipPosition="top"
+                              (click)="prepararEdicaoConta(acesso, rowIndex)"
+                            ></button>
+                            <button
+                              pButton
+                              style="margin-left: 5px"
+                              class="ui-button-danger"
+                              icon="pi pi-trash"
+                              pTooltip="Excluir"
+                              tooltipPosition="top"
+                              (click)="removerConta(rowIndex)"
+                            ></button>
+                          </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td colspan="6">Nenhum registro encontrado</td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button
+            class="btn btn-sm btn-success"
+            type="submit"
+            [disabled]="!f.valid"
+          >
+            <i class="fa  fa-save"></i>
+            <span class="hidden-xs  hidden-sm"> Salvar</span>
+          </button>
+          <button
+            class="btn btn-sm btn-primary"
+            type="button"
+            style="margin: 0 5px;"
+            (click)="novo(f)"
+          >
+            <i class="fa  fa-plus-circle"></i>
+            <span class="hidden-xs  hidden-sm"> Novo</span>
+          </button>
+
+          <button
+            routerLink="/corretores"
+            class="btn btn-sm btn-outline-danger"
+            [disabled]="!auth.temPermissao('VISUALIZAR_CORRETOR')"
+          >
+            <i class="fa fa-times"></i>
+            Retornar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="" [ngClass]="oculto" *ngIf="corretorAcesso">
+  <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #23282c">
+          <h5 class="modal-title text-white">
+            {{ editandoConta ? "Edição de Acesso" : "Novo Acesso" }}
+          </h5>
+          <button
+            (click)="oculto = 'oculto'"
+            type="button"
+            class="close"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form #frmConta="ngForm" (ngSubmit)="confirmarConta(frmConta)">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Banco/Sistema</label>
+                  <input
+                    [class.is-invalid]="banco.invalid && banco.touched"
+                    class="form-control"
+                    type="text"
+                    name="banco"
+                    maxlength="30"
+                    required
+                    [(ngModel)]="corretorAcesso.banco"
+                    #banco="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="banco"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="banco"
+                    error="maxlength"
+                    text="Máximo de 30 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Usuário</label>
+                  <input
+                    [class.is-invalid]="usuario.invalid && usuario.touched"
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="usuario"
+                    required
+                    [(ngModel)]="corretorAcesso.usuario"
+                    #usuario="ngModel"
+                  />
+                  <app-message
+                    [control]="usuario"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Senha</label>
+                  <input
+                    [class.is-invalid]="senha.invalid && senha.touched"
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="senha"
+                    required
+                    [(ngModel)]="corretorAcesso.senha"
+                    #senha="ngModel"
+                  />
+                  <app-message
+                    [control]="senha"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Código Agente</label>
+                  <input
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="codigo_agente"
+                    [(ngModel)]="corretorAcesso.codigo_agente"
+                    #codigo_agente="ngModel"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Operador</label>
+                  <input
+                    maxlength="30"
+                    class="form-control"
+                    type="text"
+                    name="operador"
+                    [(ngModel)]="corretorAcesso.operador"
+                    #operador="ngModel"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              (click)="oculto = 'oculto'; frmConta.reset()"
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-sm btn-success"
+              [disabled]="!frmConta.valid"
+            >
+              <i class="fa fa-save"></i> Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

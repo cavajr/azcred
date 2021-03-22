@@ -1,0 +1,122 @@
+<div class="card">
+  <div class="card-header">
+    <strong style="color: darkgreen;">CPF:: {{ corretor.cpf }} - {{ corretor.nome }} </strong>
+  </div>
+  <div class="card-body">
+    <p-table [value]="corretor.contratos" expandableRows="true"
+      dataKey="id" rowExpandMode="single" [(selection)]="selecionados"
+      [scrollable]="true" [style]="{ width: 'auto' }" scrollHeight="200px"
+      (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)"
+      (onHeaderCheckboxToggle)="selectAll($event)"
+      >
+      <ng-template pTemplate="colgroup">
+        <colgroup>
+          <col style="width: 3em" />
+          <col style="width: 3em" />
+          <col style="width:130px" />
+          Proposta
+          <col style="width:130px" />
+          Contrato
+          <col style="width:250px" />
+          Banco
+          <col style="width:120px" />
+          Dt Operação
+          <col style="width:120px" />
+          Valor Contrato R$
+          <col style="width:120px" />
+          % Agente
+          <col style="width:120px" />
+          R$ Agente
+        </colgroup>
+      </ng-template>
+      <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3em">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th style="width: 3em"></th>
+            <th>Proposta</th>
+            <th>Contrato</th>
+            <th>Banco</th>
+            <th>Dt Operação</th>
+            <th>Valor Contrato R$</th>
+            <th>% Agente</th>
+            <th>R$ Agente</th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-contrato let-rowData let-expanded="expanded">
+        <tr [pSelectableRow]="rowData">
+            <td>
+              <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+            </td>
+            <td>
+              <a href="#" [pRowToggler]="rowData">
+                <i [ngClass]="
+                    expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'
+                  "></i>
+              </a>
+            </td>
+            <td>{{ contrato.proposta }}</td>
+            <td>{{ contrato.contrato }}</td>
+            <td>{{ contrato.banco }}</td>
+            <td>{{ contrato.data_operacao | date: "dd/MM/yyyy" }}</td>
+            <td style="text-align: right">
+              {{ contrato.valor_contrato | number: "1.2-2" }}
+            </td>
+            <td style="text-align: right">{{ contrato.corretor_perc_comissao | number: "1.2-2" }}</td>
+            <td style="text-align: right">{{ contrato.corretor_valor_comissao | number: "1.2-2" }}</td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="rowexpansion" let-i="rowIndex" let-contrato>
+        <tr>
+          <td colspan="9">
+            <div class="ui-g ui-fluid" style="font-size:12px;padding:10px">
+              <div class="ui-g-12 ui-md-12">
+                <b>CPF: </b> {{ contrato.cpf }}
+              </div>
+
+              <div class="ui-g-12 ui-md-12">
+                <b>Cliente: </b> {{ contrato.cliente }}
+              </div>
+
+              <div class="ui-g-12 ui-md-12">
+                <b>Dt Crédito: </b> {{ contrato.data_credito_cliente | date: "dd/MM/yyyy" }}
+              </div>
+
+              <div class="ui-g-12 ui-md-12">
+                <b>NCR: </b> {{ contrato.data_ncr | date: "dd/MM/yyyy" }}
+              </div>
+
+              <div class="ui-g-12 ui-md-12">
+                <b>Tabela: </b> {{ contrato.tabela }}
+              </div>
+
+              <div class="ui-g-12 ui-md-12">
+                <b>Prazo: </b> {{ contrato.prazo }}
+              </div>
+
+              <div class="ui-g-12 ui-md-12">
+                <b>Físico Pendente: </b>
+                <span [style.color]="
+                    contrato.fisicopendente === 'S' ? 'red' : 'green'
+                  ">
+                  {{ contrato.fisicopendente }}
+                </span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <table>
+          <tr>
+            <td>TOTAL SELECIONADO PARA PAGAMENTO: {{ totalComissao | number: "1.2-2" }}</td>
+            <td style="color: red;">TARIFA: {{ corretor.tarifa | number: "1.2-2" }}</td>
+            <td *ngIf="totaliza >= 0" style="color: blue;">SALDO PAGAMENTO: {{ totaliza | number: "1.2-2" }}</td>
+            <td *ngIf="totaliza < 0" style="color: red;">SALDO PAGAMENTO: {{ totaliza | number: "1.2-2" }}</td>
+          </tr>
+        </table>
+    </ng-template>
+  </p-table>
+  </div>
+</div>

@@ -1,0 +1,361 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header"><strong>Filtros</strong></div>
+      <form autocomplete="off" (ngSubmit)="pesquisar()">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12 col-lg-2">
+              <div class="form-group">
+                <ng-select
+                  placeholder="Tipo de Operação"
+                  [(ngModel)]="filtro.operacao"
+                  [items]="operacoes"
+                  name="operacao"
+                  [bindLabel]="'label'"
+                  [bindValue]="'value'"
+                  clearAllText="Limpar"
+                  loadingText="Carregando..."
+                  notFoundText="Nenhum registro encontrado"
+                ></ng-select>
+              </div>
+            </div>
+            <div class="col-12 col-lg-10">
+              <div class="form-group">
+                <input
+                  placeholder="Descrição"
+                  class="form-control"
+                  type="text"
+                  name="cliente"
+                  [(ngModel)]="filtro.cliente"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <ng-select
+                  placeholder="Selecione o Corretor"
+                  [(ngModel)]="filtro.corretor"
+                  name="corretor"
+                  [selectOnTab]="true"
+                  clearAllText="Limpar"
+                  loadingText="Carregando..."
+                  notFoundText="Nenhum registro encontrado"
+                >
+                  <ng-option
+                    *ngFor="let corretor of corretores"
+                    [value]="corretor.id"
+                    [disabled]="corretor.ativo == 'N'"
+                    >{{ corretor.nome }}</ng-option
+                  >
+                </ng-select>
+
+              </div>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col-12 col-lg-3">
+              <div class="form-group">
+                <input
+                  class="form-control"
+                  placeholder="Data Implantação"
+                  bsDatepicker
+                  [bsConfig]="bsConfig"
+                  [(ngModel)]="filtro.ncr"
+                  name="ncr"
+                />
+              </div>
+            </div>
+            <div class="col-12 col-lg-3">
+              <div class="form-group">
+                <ng-select
+                  placeholder="Pago?"
+                  [(ngModel)]="filtro.pago"
+                  [items]="pagos"
+                  name="pago"
+                  [bindLabel]="'label'"
+                  [bindValue]="'value'"
+                  clearAllText="Limpar"
+                  loadingText="Carregando..."
+                  notFoundText="Nenhum registro encontrado"
+                ></ng-select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm btn-outline-success" type="submit">
+            <i class="fa fa-search-plus"></i> Pesquisar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Listagem</strong>
+        <button
+          (click)="novo($event)"
+          class="btn btn-sm btn-primary botao-card-direito"
+        >
+          <i class="fa fa-plus"></i> Crédito/Débito
+        </button>
+      </div>
+      <div class="card-body">
+        <p-table
+          [value]="producoes"
+          [responsive]="true"
+          [paginator]="true"
+          [rows]="filtro.itensPorPagina"
+          [lazy]="true"
+          [loading]="loading"
+          [totalRecords]="totalRegistros"
+          (onLazyLoad)="aoMudarPagina($event)"
+          #tabela
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 5em; text-align: center;">Pago</th>
+              <th>Data Implantação</th>
+              <th>Descrição</th>
+              <th>Corretor</th>
+              <th>Valor R$</th>
+              <th style="width: 80px; text-align: center;">Ações</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-operacao>
+            <tr>
+              <td *ngIf="operacao.pago === 'S'" style="text-align: center">
+                <span class="badge-success">SIM</span>
+              </td>
+              <td *ngIf="operacao.pago === 'N'" style="text-align: center">
+                <span class="badge-danger">NÃO</span>
+              </td>
+              <td>{{ operacao.data_importacao | date: "dd/MM/yyyy" }}</td>
+              <td>{{ operacao.cliente }}</td>
+              <td>{{ operacao.corretor }}</td>
+              <td style="text-align: right; color: blue;" *ngIf="operacao.valor_contrato > 0">
+                {{ operacao.valor_contrato | number: "1.2-2" }}
+              </td>
+              <td style="text-align: right; color: red;" *ngIf="operacao.valor_contrato < 0">
+                {{ operacao.valor_contrato | number: "1.2-2" }}
+              </td>
+              <td style="width: 80px; text-align: center;">
+                <button
+                  pButton
+                  class="ui-button-danger"
+                  icon="pi pi-trash"
+                  pTooltip="Excluir"
+                  tooltipPosition="top"
+                  (click)="confirmarExclusao(operacao)"
+                  [disabled]="!auth.temPermissao('VISUALIZAR_PRODUCAO')"
+                ></button>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6">Nenhum registro encontrado</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="" [ngClass]="oculto" *ngIf="producao">
+  <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #23282c">
+          <h5 class="modal-title text-white">
+            Novo Crédito/Débito Manual
+          </h5>
+          <button
+            (click)="oculto = 'oculto'"
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            ×
+          </button>
+        </div>
+        <form #frm="ngForm" (ngSubmit)="confirmar(frm)" autocomplete="off">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Tipo de Operação</label>
+                  <ng-select
+                    placeholder="Tipo de Operação"
+                    [(ngModel)]="producao.operacao"
+                    [items]="operacoes"
+                    name="operacao"
+                    #operacao="ngModel"
+                    required
+                    [bindLabel]="'label'"
+                    [bindValue]="'value'"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  ></ng-select>
+                  <app-message
+                    [control]="operacao"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Data</label>
+                  <input
+                    class="form-control"
+                    placeholder="Selecione uma data"
+                    bsDatepicker
+                    [bsConfig]="bsConfig"
+                    [(ngModel)]="producao.data_ncr"
+                    name="data_ncr"
+                    #data_ncr="ngModel"
+                    required
+                  />
+                  <app-message
+                    [control]="data_ncr"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Corretor</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      corretor_id.invalid && corretor_id.touched
+                    "
+                    [(ngModel)]="producao.corretor_id"
+                    name="corretor_id"
+                    #corretor_id="ngModel"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                    <ng-option
+                      *ngFor="let corretor of corretores"
+                      [value]="corretor.id"
+                      [disabled]="corretor.ativo == 'N'"
+                      >{{ corretor.nome }}</ng-option
+                    >
+                  </ng-select>
+                  <app-message
+                    [control]="corretor_id"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Descrição</label>
+                  <input
+                    type="text"
+                    name="cliente"
+                    class="form-control"
+                    [class.is-invalid]="cliente.invalid && cliente.touched"
+                    required
+                    [(ngModel)]="producao.cliente"
+                    #cliente="ngModel"
+                    minlength="3"
+                    maxlength="200"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="cliente"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                  <app-message
+                    [control]="cliente"
+                    error="minlength"
+                    text="Mínimo de 3 caracteres"
+                  ></app-message>
+                  <app-message
+                    [control]="cliente"
+                    error="maxlength"
+                    text="Mínimo de 200 caracteres"
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Valor</label>
+                  <input
+                    [class.is-invalid]="
+                      corretor_valor_comissao.invalid &&
+                      corretor_valor_comissao.touched
+                    "
+                    class="form-control"
+                    type="text"
+                    name="corretor_valor_comissao"
+                    [(ngModel)]="producao.corretor_valor_comissao"
+                    #corretor_valor_comissao="ngModel"
+                    required
+                    currencyMask
+                    [options]="{
+                      prefix: '',
+                      thousands: '.',
+                      decimal: ',',
+                      allowNegative: false
+                    }"
+                  />
+                  <app-message
+                    [control]="corretor_valor_comissao"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              (click)="oculto = 'oculto'; frm.reset()"
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-sm btn-success"
+              [disabled]="frm.invalid"
+            >
+              <i class="fa fa-save"></i>
+              <span class="hidden-xs  hidden-sm"> Salvar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

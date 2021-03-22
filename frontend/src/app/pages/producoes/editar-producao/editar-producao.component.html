@@ -1,0 +1,354 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-primary">
+      <div class="card-header">
+        <strong>Edição</strong>
+      </div>
+      <form [formGroup]="formulario" autocomplete="off" (ngSubmit)="salvar()">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xl-6">
+              <div class="form-group">
+                <label>Proposta</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="proposta"
+                  formControlName="proposta"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xl-6">
+              <div class="form-group">
+                <label>Contrato</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="contrato"
+                  formControlName="contrato"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>Cliente</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="cliente"
+                  formControlName="cliente"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Data Operação</label>
+                <input
+                  class="form-control"
+                  placeholder="Selecione uma data"
+                  bsDatepicker
+                  disabled="true"
+                  [bsConfig]="bsConfig"
+                  formControlName="data_operacao"
+                  name="data_operacao"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Data Crédito Cliente</label>
+                <input
+                  class="form-control"
+                  placeholder="Selecione uma data"
+                  bsDatepicker
+                  disabled="true"
+                  [bsConfig]="bsConfig"
+                  formControlName="data_credito_cliente"
+                  name="data_credito_cliente"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xl-6">
+              <div class="form-group">
+                <label>Banco</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="banco"
+                  formControlName="banco"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xl-6">
+              <div class="form-group">
+                <label>Produto</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="produto"
+                  formControlName="produto"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xl-6">
+              <div class="form-group">
+                <label>Tabela</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="tabela"
+                  formControlName="tabela"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xl-6">
+              <div class="form-group">
+                <label>Usuário</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="usuario"
+                  formControlName="usuario"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-2">
+              <div class="form-group">
+                <label>Prazo</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="prazo"
+                  formControlName="prazo"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+            <div class="col-md-1">
+              <div class="form-group">
+                <label>Pago</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="pago"
+                  formControlName="pago"
+                  disabled="true"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>Valor Contrato</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="valor_contrato"
+                  disabled="true"
+                  formControlName="valor_contrato"
+                  currencyMask
+                  [options]="{
+                    prefix: '',
+                    thousands: '.',
+                    decimal: ',',
+                    allowNegative: false
+                  }"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>% Contrato</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="perc_comissao"
+                  disabled="true"
+                  formControlName="perc_comissao"
+                  currencyMask
+                  [options]="{
+                    prefix: '',
+                    thousands: '.',
+                    decimal: ',',
+                    allowNegative: false
+                  }"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>% Empresa</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="correspondente_perc_comissao"
+                  formControlName="correspondente_perc_comissao"
+                  disabled="true"
+                  currencyMask
+                  [options]="{
+                    prefix: '',
+                    thousands: '.',
+                    decimal: ',',
+                    allowNegative: true
+                  }"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-9">
+              <div class="form-group">
+                <label>Corretor</label>
+                <ng-select
+                  (change)="retornaComissao($event)"
+                  [class.is-invalid]="
+                    formulario.get('corretor_id').invalid &&
+                    formulario.get('corretor_id').touched
+                  "
+                  formControlName="corretor_id"
+                  name="corretor_id"
+                  required
+                  [selectOnTab]="true"
+                  clearAllText="Limpar"
+                  loadingText="Carregando..."
+                  notFoundText="Nenhum registro encontrado"
+                >
+                  <ng-option
+                    *ngFor="let corretor of listaCorretores"
+                    [value]="corretor.id"
+                    [disabled]="corretor.ativo == 'N'"
+                    >{{ corretor.nome }}</ng-option
+                  >
+                </ng-select>
+                <app-message
+                  [control]="formulario.get('corretor_id')"
+                  error="required"
+                  text="O corretor é obrigatório."
+                ></app-message>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label>% Agente</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="corretor_perc_comissao"
+                  formControlName="corretor_perc_comissao"
+                  (input)="onSearchChange($event)"
+                  currencyMask
+                  [options]="{
+                    prefix: '',
+                    thousands: '.',
+                    decimal: ',',
+                    allowNegative: false
+                  }"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Físico Pendente</label>
+                <ng-select
+                  [class.is-invalid]="
+                    formulario.get('fisicopendente').invalid &&
+                    formulario.get('fisicopendente').touched
+                  "
+                  formControlName="fisicopendente"
+                  [items]="fisicopendente"
+                  name="fisicopendente"
+                  required
+                  [selectOnTab]="true"
+                  clearAllText="Limpar"
+                  [bindLabel]="'label'"
+                  [bindValue]="'value'"
+                  loadingText="Carregando..."
+                  notFoundText="Nenhum registro encontrado"
+                >
+                </ng-select>
+                <app-message
+                  [control]="formulario.get('fisicopendente')"
+                  error="required"
+                  text="Campo obrigatório."
+                ></app-message>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Data Físico</label>
+                <input
+                  [class.is-invalid]="
+                    formulario.get('data_fisico').invalid &&
+                    formulario.get('data_fisico').touched
+                  "
+                  class="form-control"
+                  placeholder="Selecione uma data"
+                  bsDatepicker
+                  [bsConfig]="bsConfig"
+                  formControlName="data_fisico"
+                  name="data_fisico"
+                />
+                <app-message
+                  [control]="formulario.get('data_fisico')"
+                  error="required"
+                  text="Campo obrigatório."
+                ></app-message>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button
+            class="btn btn-sm btn-success"
+            type="submit"
+            [disabled]="!formulario.valid"
+          >
+            <i class="fa fa-save"></i>
+            Salvar
+          </button>
+
+          <button
+            style="margin: 0 5px;"
+            routerLink="/producoes"
+            class="btn btn-sm btn-outline-danger"
+            [disabled]="!auth.temPermissao('VISUALIZAR_PRODUCAO')"
+          >
+            <i class="fa fa-times"></i>
+            Retornar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

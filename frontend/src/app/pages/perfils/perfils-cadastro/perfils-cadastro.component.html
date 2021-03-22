@@ -1,0 +1,99 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Novo Registro</strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="salvar(f)">
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Nome</label>
+                  <input
+                    [class.is-invalid]="nomeTipo.invalid && nomeTipo.touched"
+                    class="form-control"
+                    type="text"
+                    name="nome"
+                    required
+                    [(ngModel)]="perfil.nome"
+                    #nomeTipo="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="nomeTipo"
+                    error="required"
+                    text="O nome é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Ativo</label>
+                  <ng-select
+                    [class.is-invalid]="ativo.invalid && ativo.touched"
+                    [searchable]="false"
+                    [clearable]="false"
+                    name="ativo"
+                    #ativo="ngModel"
+                    required
+                    [(ngModel)]="perfil.ativo"
+                    [disabled]="!auth.temPermissao('EXCLUIR_COMISSAO')"
+                  >
+                    <ng-option [value]="'S'">SIM</ng-option>
+                    <ng-option [value]="'N'">NÃO</ng-option>
+                  </ng-select>
+
+                  <app-message
+                    [control]="ativo"
+                    error="required"
+                    text="Campo é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-12">
+                <button
+                  class="btn btn-sm btn-success"
+                  type="submit"
+                  [disabled]="!f.valid"
+                >
+                  <i class="fa  fa-save"></i>
+                  <span class="hidden-xs  hidden-sm"> Salvar</span>
+                </button>
+                <button
+                  class="btn btn-sm btn-primary"
+                  type="button"
+                  style="margin: 0 5px;"
+                  (click)="novo(f)"
+                >
+                  <i class="fa  fa-plus-circle"></i>
+                  <span class="hidden-xs  hidden-sm"> Novo</span>
+                </button>
+                <button
+                  routerLink="/perfils"
+                  class="btn btn-sm btn-outline-danger"
+                  [disabled]="!auth.temPermissao('VISUALIZAR_COMISSAO')"
+                >
+                  <i class="fa fa-times"></i>
+                  Retornar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,270 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>{{ editando ? "Edição" : "Novo Registro" }}</strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="salvar(f)">
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Nome</label>
+                  <input
+                    [class.is-invalid]="nomeTipo.invalid && nomeTipo.touched"
+                    class="form-control"
+                    type="text"
+                    name="nome"
+                    required
+                    [(ngModel)]="tipo.nome"
+                    #nomeTipo="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="nomeTipo"
+                    error="required"
+                    text="O nome é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Ativo</label>
+                  <ng-select
+                    [class.is-invalid]="ativo.invalid && ativo.touched"
+                    [searchable]="false"
+                    [clearable]="false"
+                    name="ativo"
+                    #ativo="ngModel"
+                    required
+                    [(ngModel)]="tipo.ativo"
+                    [disabled]="!auth.temPermissao('EXCLUIR_TIPO_CONTRATO')"
+                  >
+                    <ng-option [value]="'S'">SIM</ng-option>
+                    <ng-option [value]="'N'">NÃO</ng-option>
+                  </ng-select>
+
+                  <app-message
+                    [control]="ativo"
+                    error="required"
+                    text="Campo é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header bg-default">
+                    <strong>
+                      Configuração dos Tipos por Sistema
+                    </strong>
+                    <button
+                      (click)="prepararNovaTipo($event)"
+                      class="btn btn-sm btn-primary botao-card-direito"
+                    >
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </div>
+                  <div class="card-body">
+                    <p-table
+                      [value]="tiposSistemas"
+                      [responsive]="true"
+                      [paginator]="true"
+                      [rows]="10"
+                      #tabTipo
+                    >
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th>Sistema</th>
+                          <th class="text-center">Mostrar por</th>
+                          <th style="width: 120px; text-align: center;">
+                            Ações
+                          </th>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template
+                        pTemplate="body"
+                        let-tipo
+                        let-rowIndex="rowIndex"
+                      >
+                        <tr>
+                          <td>{{ tipo.sistema_id.nome }}</td>
+                          <td *ngIf="tipo.liquido === 1" class="text-center">
+                            Valor Líquido
+                          </td>
+                          <td *ngIf="tipo.liquido === 0" class="text-center">
+                            Valor Bruto
+                          </td>
+                          <td style="width: 120px; text-align: center;">
+                            <button
+                              pButton
+                              style="margin-left: 5px"
+                              icon="fa fa-pencil"
+                              type="button"
+                              pTooltip="Editar"
+                              tooltipPosition="top"
+                              (click)="prepararEdicaoTipo(tipo, rowIndex)"
+                            ></button>
+                            <button
+                              pButton
+                              style="margin-left: 5px"
+                              class="ui-button-danger"
+                              icon="pi pi-trash"
+                              pTooltip="Excluir"
+                              tooltipPosition="top"
+                              (click)="removerTipo(rowIndex)"
+                            ></button>
+                          </td>
+                        </tr>
+                      </ng-template>
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td colspan="3">Nenhuma configuração encontrada</td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-12">
+                <button
+                  class="btn btn-sm btn-success"
+                  type="submit"
+                  [disabled]="!f.valid"
+                >
+                  <i class="fa  fa-save"></i>
+                  <span class="hidden-xs  hidden-sm"> Salvar</span>
+                </button>
+                <button
+                  class="btn btn-sm btn-primary"
+                  type="button"
+                  style="margin: 0 5px;"
+                  (click)="novo(f)"
+                >
+                  <i class="fa  fa-plus-circle"></i>
+                  <span class="hidden-xs  hidden-sm"> Novo</span>
+                </button>
+                <button
+                  routerLink="/tipos"
+                  class="btn btn-sm btn-outline-danger"
+                  [disabled]="!auth.temPermissao('VISUALIZAR_TIPO_CONTRATO')"
+                >
+                  <i class="fa fa-times"></i>
+                  Retornar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="" [ngClass]="oculto" *ngIf="tipoSistema">
+  <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+    <div class="modal-dialog  modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #23282c">
+          <h5 class="modal-title text-white">
+            {{ editandoTipo ? "Edição de Configuração" : "Nova Configuração" }}
+          </h5>
+          <button
+            (click)="oculto = 'oculto'"
+            type="button"
+            class="close"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form #frmSistema="ngForm" (ngSubmit)="confirmarTipo(frmSistema)">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Sistema</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      sistema_id.invalid && sistema_id.touched
+                    "
+                    [(ngModel)]="tipoSistema.sistema_id"
+                    [items]="listaSistemas"
+                    #sistema_id="ngModel"
+                    name="sistema_id"
+                    required
+                    [selectOnTab]="true"
+                    clearAllText="Limpar"
+                    [bindLabel]="'nome'"
+                    loadingText="Carregando..."
+                    notFoundText="Nenhum registro encontrado"
+                  >
+                  </ng-select>
+                  <app-message
+                    [control]="sistema_id"
+                    error="required"
+                    text="O sistema é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Mostrar por</label>
+                  <ng-select
+                    [class.is-invalid]="liquido.invalid && liquido.touched"
+                    [searchable]="false"
+                    [clearable]="false"
+                    name="liquido"
+                    #liquido="ngModel"
+                    required
+                    [(ngModel)]="tipoSistema.liquido"
+                  >
+                    <ng-option [value]="1">VALOR LÍQUIDO</ng-option>
+                    <ng-option [value]="0">VALOR BRUTO</ng-option>
+                  </ng-select>
+                  <app-message
+                    [control]="liquido"
+                    error="required"
+                    text="Campo é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              (click)="oculto = 'oculto'; frmSistema.reset()"
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-sm btn-success"
+              [disabled]="!frmSistema.valid"
+            >
+              <i class="fa fa-save"></i>
+              <span class="hidden-xs  hidden-sm"> Salvar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

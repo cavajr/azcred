@@ -1,0 +1,35 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Contratos Aptos para Pagamento por Corretor</strong>
+      </div>
+      <div class="card-body">
+        <div *ngIf="corretores.length >0">
+          <app-pagamento-individual *ngFor="let corretor of corretores"
+              [corretor]="corretor" (rowSelect)="onRowSelect($event)"
+              (rowUnselect)="onRowUnselect($event)" (rowsSelectAll)="selectAll($event)"
+          >
+          </app-pagamento-individual>
+        </div>
+        <div *ngIf="corretores.length == 0">
+          <p>Nenhum pagamento para efetuar</p>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>RESUMO GERAL:</strong></p>
+            <p>TOTAL BRUTO DE COMISSÃO: {{ totalComissao | number: "1.2-2" }}</p>
+            <p style="color: red;">TOTAL DE TARIFAS: {{ totalTarifa | number: "1.2-2" }}</p>
+            <p *ngIf="totalGeral >= 0" style="color: blue;">SALDO PAGAMENTO: {{ totalGeral | number: "1.2-2" }}</p>
+            <p *ngIf="totalGeral < 0" style="color: red;">SALDO PAGAMENTO: {{ totalGeral | number: "1.2-2" }}</p>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-success btn-sm float-right" (click)="pagar()" [disabled]="!temSelecionados()">Efetuar Pagamento</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

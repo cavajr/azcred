@@ -1,0 +1,43 @@
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-9">
+    <div class="card border-success">
+      <div class="card-header">
+        <strong>Perfil do Usuário</strong>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="exampleInputuname">Nome</label>
+          <input [ngModel]="auth.jwtPayload.user.name" [disabled]="true" name="name" type="text" class="form-control" placeholder="Nome" />
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">E-mail</label>
+          <input [ngModel]="auth.jwtPayload.user.email" [disabled]="true" name="email" type="text" class="form-control" placeholder="Email" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xs-12 col-sm-12 col-md-3">
+    <div class="card border-primary">
+      <div class="card-header">
+        <strong>Foto do usuario</strong>
+      </div>
+      <div class="card-body">
+        <img *ngIf="!imagenTemp" [src]="usuario.arquivo | imagem" class="img-circle rounded mx-auto d-block" width="150" />
+        <img *ngIf="imagenTemp" [src]="imagenTemp" class="img-circle rounded mx-auto d-block" width="150" />
+
+        <br />
+
+        <input (change)="selecionaImagem($event.target.files[0])" type="file" />
+
+        <br />
+      </div>
+      <div class="card-footer">
+        <button (click)="onUpload()" [disabled]="!imagenSubir" type="button" class="btn btn-sm btn-block btn-success">
+          <i class="fa fa-save"></i>
+          Atualizar Foto
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

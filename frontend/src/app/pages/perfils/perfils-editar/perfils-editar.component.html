@@ -1,0 +1,357 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Editar Registro</strong>
+      </div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="salvar(f)">
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Nome</label>
+                  <input
+                    [class.is-invalid]="nomeTipo.invalid && nomeTipo.touched"
+                    class="form-control"
+                    type="text"
+                    name="nome"
+                    required
+                    [(ngModel)]="perfil.nome"
+                    #nomeTipo="ngModel"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
+                  <app-message
+                    [control]="nomeTipo"
+                    error="required"
+                    text="O nome é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label>Ativo</label>
+                  <ng-select
+                    [class.is-invalid]="ativo.invalid && ativo.touched"
+                    [searchable]="false"
+                    [clearable]="false"
+                    name="ativo"
+                    #ativo="ngModel"
+                    required
+                    [(ngModel)]="perfil.ativo"
+                    [disabled]="!auth.temPermissao('EXCLUIR_COMISSAO')"
+                  >
+                    <ng-option [value]="'S'">SIM</ng-option>
+                    <ng-option [value]="'N'">NÃO</ng-option>
+                  </ng-select>
+
+                  <app-message
+                    [control]="ativo"
+                    error="required"
+                    text="Campo é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header bg-default">
+                    <strong>
+                      Personalização de Comissão por Perfil
+                    </strong>
+                    <button
+                      (click)="prepararNovaComissao($event)"
+                      class="btn btn-sm btn-primary botao-card-direito"
+                    >
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </div>
+                  <div class="card-body">
+                    <p-table
+                      [value]="perfilComissoes"
+                      [responsive]="true"
+                      [paginator]="true"
+                      [rows]="15"
+                      [loading]="loading"
+                      #tabela
+                    >
+                      <ng-template pTemplate="header">
+                        <tr>
+                          <th style="width: 20%; text-align: center;">Tipo</th>
+                          <th style="width: 20%; text-align: center;">
+                            %/R$ Início
+                          </th>
+                          <th style="width: 20%; text-align: center;">
+                            %/R$ Fim
+                          </th>
+                          <th style="width: 20%; text-align: center;">
+                            %/R$ Comissão
+                          </th>
+                          <th style="width: 20%; text-align: center;">Ações</th>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template
+                        pTemplate="body"
+                        let-comissao
+                        let-rowIndex="rowIndex"
+                      >
+                        <tr>
+                          <td style="text-align: center;">
+                            {{ comissao.real_percentual === 0 ? "R$" : "%" }}
+                          </td>
+                          <td style="text-align: right;">
+                            {{ comissao.perc_pago_inicio | number: "1.2-2" }}
+                          </td>
+                          <td style="text-align: right;">
+                            {{ comissao.perc_pago_fim | number: "1.2-2" }}
+                          </td>
+                          <td style="text-align: right;">
+                            {{ comissao.comissao | number: "1.2-2" }}
+                          </td>
+                          <td style="width: 25%; text-align: center;">
+                            <button
+                              pButton
+                              class="ui-button-warning"
+                              icon="pi pi-pencil"
+                              pTooltip="Editar"
+                              tooltipPosition="top"
+                              (click)="
+                                prepararEdicaoComissao(comissao, rowIndex)
+                              "
+                              [disabled]="
+                                !auth.temPermissao('CADASTRAR_COMISSAO')
+                              "
+                            ></button>
+                            <button
+                              pButton
+                              (click)="removerComissao(rowIndex)"
+                              style="margin-left: 5px"
+                              class="ui-button-danger"
+                              icon="pi pi-trash"
+                              pTooltip="Excluir"
+                              tooltipPosition="top"
+                              [disabled]="
+                                !auth.temPermissao('EXCLUIR_COMISSAO')
+                              "
+                            ></button>
+                          </td>
+                        </tr>
+                      </ng-template>
+
+                      <ng-template pTemplate="summary">
+                        Média de Comissão é de {{ media | number: "1.2-2" }} %
+                      </ng-template>
+
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td colspan="5">
+                            Nenhuma configuração de comissão encontrada
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-12">
+                <button
+                  class="btn btn-sm btn-success"
+                  type="submit"
+                  [disabled]="!f.valid"
+                >
+                  <i class="fa  fa-save"></i>
+                  <span class="hidden-xs  hidden-sm"> Salvar</span>
+                </button>
+                <button
+                  class="btn btn-sm btn-primary"
+                  type="button"
+                  style="margin: 0 5px;"
+                  (click)="novo(f)"
+                >
+                  <i class="fa  fa-plus-circle"></i>
+                  <span class="hidden-xs  hidden-sm"> Novo</span>
+                </button>
+                <button
+                  routerLink="/perfils"
+                  class="btn btn-sm btn-outline-danger"
+                  [disabled]="!auth.temPermissao('VISUALIZAR_COMISSAO')"
+                >
+                  <i class="fa fa-times"></i>
+                  Retornar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="" [ngClass]="oculto" *ngIf="perfilComissao">
+  <div class="modal" style="display: block;" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #23282c">
+          <h5 class="modal-title text-white">
+            {{ editandoComissao ? "Edição" : "Novo Registro" }}
+          </h5>
+          <button
+            (click)="oculto = 'oculto'"
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            ×
+          </button>
+        </div>
+        <form #frm="ngForm" (ngSubmit)="confirmarComissao(frm)">
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Tipo</label>
+                  <ng-select
+                    [searchable]="false"
+                    [clearable]="false"
+                    name="real_percentual"
+                    #real_percentual="ngModel"
+                    [class.is-invalid]="
+                      real_percentual.invalid && real_percentual.touched
+                    "
+                    required
+                    [(ngModel)]="perfilComissao.real_percentual"
+                  >
+                    <ng-option [value]="0">REAL</ng-option>
+                    <ng-option [value]="1">PERCENTUAL</ng-option>
+                  </ng-select>
+                  <app-message
+                    [control]="real_percentual"
+                    error="required"
+                    text="Campo é obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="control-label">Valor Início</label>
+                  <input
+                    type="text"
+                    name="perc_pago_inicio"
+                    class="form-control"
+                    [class.is-invalid]="inicio.invalid && inicio.touched"
+                    required
+                    [(ngModel)]="perfilComissao.perc_pago_inicio"
+                    #inicio="ngModel"
+                    currencyMask
+                    [options]="{
+                      prefix: '',
+                      thousands: '.',
+                      decimal: ',',
+                      allowNegative: false
+                    }"
+                  />
+                  <app-message
+                    [control]="inicio"
+                    error="required"
+                    text="Valor obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="control-label">Valor Fim</label>
+                  <input
+                    type="text"
+                    name="perc_pago_fim"
+                    class="form-control"
+                    [class.is-invalid]="fim.invalid && fim.touched"
+                    required
+                    [(ngModel)]="perfilComissao.perc_pago_fim"
+                    #fim="ngModel"
+                    currencyMask
+                    [options]="{
+                      prefix: '',
+                      thousands: '.',
+                      decimal: ',',
+                      allowNegative: false
+                    }"
+                  />
+                  <app-message
+                    [control]="fim"
+                    error="required"
+                    text="Valor obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="control-label">Comissão %/R$</label>
+                  <input
+                    type="text"
+                    [class.is-invalid]="
+                      perc_comissao.invalid && perc_comissao.touched
+                    "
+                    name="comissao"
+                    class="form-control"
+                    required
+                    [(ngModel)]="perfilComissao.comissao"
+                    #perc_comissao="ngModel"
+                    currencyMask
+                    [options]="{
+                      prefix: '',
+                      thousands: '.',
+                      decimal: ',',
+                      allowNegative: false
+                    }"
+                  />
+                  <app-message
+                    [control]="perc_comissao"
+                    error="required"
+                    text="Valor obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              (click)="oculto = 'oculto'; frm.reset()"
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-sm btn-success"
+              [disabled]="frm.invalid"
+            >
+              <i class="fa fa-save"></i>
+              <span class="hidden-xs  hidden-sm"> Salvar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

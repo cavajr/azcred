@@ -1,0 +1,113 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-primary">
+      <div class="card-header">
+        <strong>{{ editando ? "Edição" : "Novo Registro" }}</strong>
+      </div>
+      <form [formGroup]="formulario" autocomplete="off" (ngSubmit)="salvar()">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-12 col-xs-12 col-md-2">
+              <div class="form-group" [class.has-danger]="formulario.get('tipo').invalid && formulario.get('tipo').touched">
+                <label class="control-label" for="tipo">Tipo</label>
+                <ng-select
+                  id="tipo"
+                  [items]="tipos"
+                  name="tipo"
+                  formControlName="tipo"
+                  clearAllText="Limpar"
+                  [bindLabel]="'label'"
+                  [bindValue]="'value'"
+                ></ng-select>
+                <app-message [control]="formulario.get('tipo')" error="required" text="Campo obrigatório."></app-message>
+              </div>
+            </div>
+            <div class="col-sm-12 col-xs-12 col-md-2">
+              <div class="form-group" [class.has-danger]="formulario.get('data_mov').invalid && formulario.get('data_mov').touched">
+                <label class="control-label" for="data_mov">Data</label>
+                <input
+                  class="form-control"
+                  placeholder="Selecione uma data"
+                  bsDatepicker
+                  [bsConfig]="bsConfig"
+                  formControlName="data_mov"
+                  name="data_mov"
+                />
+                <app-message [control]="formulario.get('data_mov')" error="required" text="A data é obrigatória."></app-message>
+              </div>
+            </div>
+            <div class="col-sm-12 col-xs-12 col-md-8">
+              <div class="form-group" [class.has-danger]="formulario.get('nome').invalid && formulario.get('nome').touched">
+                <label class="control-label" for="nome">Nome</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  id="nome"
+                  name="nome"
+                  formControlName="nome"
+                  oninput="this.value = this.value.toUpperCase()"
+                />
+                <app-message [control]="formulario.get('nome')" error="required" text="O nome é obrigatório."></app-message>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-9">
+              <div class="form-group" [class.has-danger]="formulario.get('descricao').invalid && formulario.get('descricao').touched">
+                <label class="control-label" for="descricao">Descrição</label>
+                <textarea
+                  class="form-control"
+                  id="descricao"
+                  style="resize: none;"
+                  rows="3"
+                  name="descricao"
+                  oninput="this.value = this.value.toUpperCase()"
+                  formControlName="descricao"
+                ></textarea>
+                <app-message [control]="formulario.get('descricao')" error="required" text="A descrição é obrigatória."></app-message>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group" [class.has-danger]="formulario.get('valor').invalid && formulario.get('valor').touched">
+                <label class="control-label" for="valor">Valor</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  id="valor"
+                  name="valor"
+                  formControlName="valor"
+                  currencyMask
+                  [options]="{
+                    prefix: '',
+                    thousands: '.',
+                    decimal: ',',
+                    allowNegative: false
+                  }"
+                />
+                <app-message [control]="formulario.get('valor')" error="required" text="O valor é obrigatório."></app-message>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm btn-success" type="submit" [disabled]="!formulario.valid">
+            <i class="fa fa-save"></i>
+            Salvar
+          </button>
+          <button class="btn btn-sm btn-primary" type="button" style="margin: 0 5px;" (click)="novo()">
+            <i class="fa fa-plus-circle"></i>
+            Novo
+          </button>
+          <button routerLink="/financeiro" class="btn btn-sm btn-outline-danger" [disabled]="!auth.temPermissao('VISUALIZAR_LANCAMENTO')">
+            <i class="fa fa-times"></i>
+            Retornar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

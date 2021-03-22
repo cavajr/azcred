@@ -1,0 +1,256 @@
+<p-blockUI [blocked]="blocked">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-info">
+      <div class="card-header"><strong>Filtros</strong></div>
+      <form #f="ngForm" autocomplete="off" (ngSubmit)="pesquisar()">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>De</label>
+                <input
+                  [class.is-invalid]="de.invalid && de.touched"
+                  class="form-control"
+                  placeholder="De"
+                  bsDatepicker
+                  [bsConfig]="bsConfig"
+                  name="de"
+                  #de="ngModel"
+                  [(ngModel)]="filtro.de"
+                  required
+                />
+                <app-message
+                  [control]="de"
+                  error="required"
+                  text="A data inicial é obrigatória."
+                ></app-message>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Até</label>
+                <input
+                  [class.is-invalid]="ate.invalid && ate.touched"
+                  class="form-control"
+                  placeholder="Até"
+                  bsDatepicker
+                  [bsConfig]="bsConfig"
+                  #ate="ngModel"
+                  [(ngModel)]="filtro.ate"
+                  name="ate"
+                  required
+                />
+                <app-message
+                  [control]="ate"
+                  error="required"
+                  text="A data final é obrigatória."
+                ></app-message>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-lg-3">
+              <div class="form-group">
+                <input
+                  placeholder="CPF"
+                  class="form-control"
+                  id="cli-cpf"
+                  type="text"
+                  name="cpf"
+                  [(ngModel)]="filtro.cpf"
+                  mask="000.000.000-00"
+                  [dropSpecialCharacters]="true"
+                />
+              </div>
+            </div>
+            <div class="col-12 col-lg-9">
+              <div class="form-group">
+                <input
+                  placeholder="Cliente"
+                  class="form-control"
+                  type="text"
+                  name="cliente"
+                  [(ngModel)]="filtro.cliente"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-lg-4">
+              <div class="form-group">
+                <ng-select
+                  placeholder="Físico Pendente?"
+                  [(ngModel)]="filtro.fisico_pendente"
+                  [items]="fisicoPendente"
+                  name="fisico_pendente"
+                  [bindLabel]="'label'"
+                  [bindValue]="'value'"
+                  clearAllText="Limpar"
+                  loadingText="Carregando..."
+                  notFoundText="Nenhum registro encontrado"
+                ></ng-select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button
+            class="btn btn-sm btn-outline-success"
+            type="submit"
+            [disabled]="!f.valid"
+          >
+            <i class="fa fa-search-plus"></i> Pesquisar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12" *ngIf="producoes.length > 0">
+    <div class="card">
+      <div class="card-header">
+        <strong>Listagem</strong>
+        <button class="btn btn-primary btn-sm float-right" (click)="exportar()">
+          Exportar
+          <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <p-table
+          [value]="producoes"
+          [responsive]="false"
+          [paginator]="true"
+          [rows]="filtro.itensPorPagina"
+          [lazy]="true"
+          [loading]="loading"
+          [totalRecords]="totalRegistros"
+          (onLazyLoad)="aoMudarPagina($event)"
+          expandableRows="true"
+          dataKey="id"
+          rowExpandMode="single"
+          [scrollable]="true"
+          [style]="{ width: 'auto' }"
+          #tabela
+        >
+          <ng-template pTemplate="colgroup" let-columns>
+            <colgroup>
+              <col style="width: 3em" />
+              <col style="width:130px" />
+              CPF
+              <col style="width:400px" />
+              Cliente
+              <col style="width:120px" />
+              Dt Operação
+              <col style="width:250px" />
+              Banco
+              <col style="width:120px" />
+              Dt Crédito
+              <col style="width:120px" />
+              NCR
+              <col style="width:200px" />
+              Usuário
+              <col style="width:120px" />
+              Valor R$
+            </colgroup>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3em"></th>
+              <th>CPF</th>
+              <th>Cliente</th>
+              <th>Dt Operação</th>
+              <th>Banco</th>
+              <th>Dt Crédito</th>
+              <th>NCR</th>
+              <th>Usuário</th>
+              <th>Valor R$</th>
+            </tr>
+          </ng-template>
+
+          <ng-template
+            pTemplate="body"
+            let-contrato
+            let-rowData
+            let-expanded="expanded"
+          >
+            <tr>
+              <td>
+                <a href="#" [pRowToggler]="rowData">
+                  <i
+                    [ngClass]="
+                      expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'
+                    "
+                  ></i>
+                </a>
+              </td>
+              <td>{{ contrato.cpf }}</td>
+              <td>{{ contrato.cliente }}</td>
+              <td>{{ contrato.data_operacao | date: "dd/MM/yyyy" }}</td>
+              <td>{{ contrato.banco }}</td>
+              <td>{{ contrato.data_credito_cliente | date: "dd/MM/yyyy" }}</td>
+              <td>{{ contrato.data_ncr | date: "dd/MM/yyyy" }}</td>
+              <td>{{ contrato.usuario }}</td>
+              <td style="text-align: right">
+                {{ contrato.valor_contrato | number: "1.2-2" }}
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="rowexpansion" let-i="rowIndex" let-contrato>
+            <tr>
+              <td colspan="9">
+                <div class="ui-g ui-fluid" style="font-size:12px;padding:10px">
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Proposta: </b> {{ contrato.proposta }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Contrato: </b> {{ contrato.contrato }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Produto: </b> {{ contrato.produto }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Tabela: </b> {{ contrato.tabela }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Prazo: </b> {{ contrato.prazo }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Corretor: </b> {{ contrato.corretor }}
+                  </div>
+
+                  <div class="ui-g-12 ui-md-12">
+                    <b>Físico Pendente: </b>
+                    <span
+                      [style.color]="
+                        contrato.fisicopendente === 'S' ? 'red' : 'green'
+                      "
+                    >
+                      {{ contrato.fisicopendente }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="9">Nenhum contrato encontrado</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

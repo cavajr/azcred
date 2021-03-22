@@ -1,0 +1,73 @@
+<div class="row animated fadeIn">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <strong>Importação de Produção</strong>
+      </div>
+      <form
+        [formGroup]="formulario"
+        autocomplete="off"
+        (ngSubmit)="salvar()"
+        class="form-vertical"
+      >
+        <div class="card-body">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Selecione o Sistema</label>
+                  <ng-select
+                    [class.is-invalid]="
+                      formulario.get('sistema').invalid &&
+                      formulario.get('sistema').touched
+                    "
+                    formControlName="sistema"
+                    [items]="sistemas"
+                    [bindLabel]="'label'"
+                    [bindValue]="'value'"
+                    name="sistema"
+                    [(ngModel)]="sistema"
+                    clearAllText="Limpar"
+                    required
+                  ></ng-select>
+                  <app-message
+                    [control]="formulario.get('sistema')"
+                    error="required"
+                    text="Campo obrigatório."
+                  ></app-message>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12 col-md-12 col-xl-6">
+                <div class="form-group">
+                  <label>Arquivo de importação</label>
+                  <input
+                    class="form-control"
+                    (change)="selecionaImagem($event.target.files[0])"
+                    type="file"
+                    formControlName="arquivo"
+                    name="arquivo"
+                    accept="xlsx"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-sm btn-primary "
+              [disabled]="!formulario.valid"
+            >
+              <i class="fa fa-upload"></i>
+              Importar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
