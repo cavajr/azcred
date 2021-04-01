@@ -64,7 +64,7 @@ export class ProducoesService {
     }
 
     if (filtro.com_corretor) {
-      params = params.append('com_corretor', filtro.com_corretor.toString());
+      params = params.append("com_corretor", filtro.com_corretor.toString());
     }
 
     if (filtro.fisico_pendente) {
@@ -75,10 +75,7 @@ export class ProducoesService {
     }
 
     if (filtro.pago) {
-      params = params.append(
-        "pago",
-        filtro.pago.toString()
-      );
+      params = params.append("pago", filtro.pago.toString());
     }
 
     if (filtro.ncr) {
@@ -233,9 +230,15 @@ export class ProducoesService {
       });
   }
 
-  retornaComissao(id: number, idContrato: number): Promise<any> {
+  retornaComissao(
+    id: number,
+    idContrato: number,
+    em_real: number
+  ): Promise<any> {
+    let params = new HttpParams({});
+    params = params.append("em_real", em_real.toString());
     return this.http
-      .get<any>(`${this.producoesUrl}/${idContrato}/comissao/${id}`)
+      .get<any>(`${this.producoesUrl}/${idContrato}/comissao/${id}`, { params })
       .toPromise()
       .then(response => {
         return response;

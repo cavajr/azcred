@@ -218,26 +218,44 @@ class ProducaoController extends Controller
         return $this->showOne($producao);
     }
 
-    public function comissao($idContrato, $id)
+    public function comissao($idContrato, $id, Request $request)
     {
         $this->authorize('VISUALIZAR_PRODUCAO');
 
         $contrato = Producao::findOrFail($idContrato);
 
-        $comissao = DB::table('perfil')->select("configuracao_comissao.comissao as comissao")
-            ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
-            ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
-            ->where('corretor.id', '=', $id)
-            ->where('configuracao_comissao.real_percentual', '=', 1)
-            ->whereRaw('configuracao_comissao.perc_pago_inicio <= ' . $contrato->perc_comissao)
-            ->orderBy('configuracao_comissao.real_percentual')
-            ->orderBy('configuracao_comissao.perc_pago_inicio', 'desc')
-            ->first();
-        if ($comissao) {
-            $valor_comissao = $contrato->perc_comissao - $comissao->comissao;
+        if ($request->em_real == 1) {
+            $comissao = DB::table('perfil')->select("configuracao_comissao.comissao as comissao")
+                ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
+                ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
+                ->where('corretor.id', '=', $id)
+                ->where('configuracao_comissao.real_percentual', '=', $request->em_real)
+                ->whereRaw('configuracao_comissao.perc_pago_inicio <= ' . $contrato->perc_comissao)
+                ->orderBy('configuracao_comissao.real_percentual')
+                ->orderBy('configuracao_comissao.perc_pago_inicio', 'desc')
+                ->first();
+                if ($comissao) {
+                    $valor_comissao = $contrato->perc_comissao - $comissao->comissao;
+                } else {
+                    $valor_comissao = 0;
+                }
         } else {
-            $valor_comissao = 0;
+            $comissao = DB::table('perfil')->select("configuracao_comissao.comissao as comissao")
+                ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
+                ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
+                ->where('corretor.id', '=', $id)
+                ->where('configuracao_comissao.real_percentual', '=', $request->em_real)
+                ->whereRaw('configuracao_comissao.perc_pago_inicio <= ' . $contrato->valor_contrato)
+                ->orderBy('configuracao_comissao.real_percentual')
+                ->orderBy('configuracao_comissao.perc_pago_inicio', 'desc')
+                ->first();
+                if ($comissao) {
+                    $valor_comissao = $contrato->valor_contrato - $comissao->comissao;
+                } else {
+                    $valor_comissao = 0;
+                }
         }
+
         return response()->json($valor_comissao);
     }
 
@@ -246,7 +264,7 @@ class ProducaoController extends Controller
         $this->authorize('VISUALIZAR_PRODUCAO');
 
         $dados = $request->all();
-
+        
         $rulesEdit = [
             'fisicopendente' => 'required',
             'data_fisico' => 'date|sometimes|nullable',
@@ -274,16 +292,26 @@ class ProducaoController extends Controller
         }
 
         $contrato = Producao::findOrFail($id);
+        $contrato->em_real = $dados['em_real'];
         $contrato->fisicopendente = $dados['fisicopendente'];
         $contrato->data_fisico = $dados['data_fisico'];
         $contrato->corretor_id = $dados['corretor_id'];
-        $contrato->corretor_perc_comissao = $dados['corretor_perc_comissao'];
-        $contrato->corretor_valor_comissao = ($contrato->valor_contrato * $dados['corretor_perc_comissao']) / 100;
-        $contrato->correspondente_perc_comissao = $dados['correspondente_perc_comissao'];
-        $contrato->correspondente_valor_comissao = ($contrato->valor_contrato * $dados['correspondente_perc_comissao']) / 100;
+        if ($dados['em_real'] == 1) {
+            $contrato->corretor_perc_comissao = $dados['corretor_perc_comissao'];
+            $contrato->corretor_valor_comissao = ($contrato->valor_contrato * $dados['corretor_perc_comissao']) / 100;
+            $contrato->correspondente_perc_comissao = $dados['correspondente_perc_comissao'];
+            $contrato->correspondente_valor_comissao = ($contrato->valor_contrato * $dados['correspondente_perc_comissao']) / 100;
+        } else {
+            $contrato->perc_comissao = 0;
+            $contrato->corretor_perc_comissao = 0;
+            $contrato->corretor_valor_comissao = $dados['corretor_valor_comissao'];
+            $contrato->correspondente_perc_comissao = 0;
+            $contrato->correspondente_valor_comissao = $dados['correspondente_valor_comissao'];
+        }
         $contrato->save();
         return $this->showOne($contrato);
     }
+
 
     public function importaAmx(Request $request)
     {
@@ -340,6 +368,7 @@ class ProducaoController extends Controller
             $table->integer('corretor_id')->nullable(true);
             $table->char('fisicopendente', 1);
             $table->date('data_fisico');
+            $table->string('dsc_tipo_comissao')->nullable(true);
         });
 
         DB::beginTransaction();
@@ -401,6 +430,7 @@ class ProducaoController extends Controller
                             'corretor_perc_comissao' => 0.00,
                             'corretor_valor_comissao' => 0.00,
                             'corretor_id' => $corretor_id,
+                            'dsc_tipo_comissao' => $value->dsc_tipo_comissao
                         ];
 
                         $inserido = DB::table($file)->insert(
@@ -422,29 +452,42 @@ class ProducaoController extends Controller
                 $propostas = DB::table($file)->get();
 
                 foreach ($propostas as $prop) {
-                    $comissao = DB::table('perfil')->select('configuracao_comissao.comissao as comissao')
-                        ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
-                        ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
-                        ->where('corretor.id', '=', $prop->corretor_id)
-                        ->where('real_percentual', '=', 1)
-                        ->whereRaw('perc_pago_inicio <= ' . $prop->perc_comissao)
-                        ->orderBy('real_percentual')
-                        ->orderBy('perc_pago_inicio', 'desc')
-                        ->first();
-                    if ($comissao) {
-                        $valor_comissao = $comissao->comissao;
-                        if ($prop->perc_comissao - $valor_comissao > 0) {
-                            $corretor_perc_comissao = $prop->perc_comissao - $valor_comissao;
-                            $corretor_valor_comissao = ($prop->valor_contrato * $corretor_perc_comissao) / 100;
+                    if ($prop->dsc_tipo_comissao != 'PRÉ-ADESÃO') {
+                        $comissao = DB::table('perfil')->select('configuracao_comissao.comissao as comissao')
+                            ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
+                            ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
+                            ->where('corretor.id', '=', $prop->corretor_id)
+                            ->where('real_percentual', '=', 1)
+                            ->whereRaw('perc_pago_inicio <= ' . $prop->valor_contrato)
+                            ->orderBy('real_percentual')
+                            ->orderBy('perc_pago_inicio', 'desc')
+                            ->first();
+                        if ($comissao) {
+                            $valor_comissao = $comissao->comissao;
+                            if ($prop->perc_comissao - $valor_comissao > 0) {
+                                $corretor_perc_comissao = $prop->perc_comissao - $valor_comissao;
+                                $corretor_valor_comissao = ($prop->valor_contrato * $corretor_perc_comissao) / 100;
+                            } else {
+                                $corretor_perc_comissao = 0;
+                                $corretor_valor_comissao = 0;
+                            }
                         } else {
+                            $valor_comissao = 0;
                             $corretor_perc_comissao = 0;
                             $corretor_valor_comissao = 0;
                         }
                     } else {
-                        $valor_comissao = 0;
-                        $corretor_perc_comissao = 0;
-                        $corretor_valor_comissao = 0;
+                        $comissao = DB::table('perfil')->select('configuracao_comissao.comissao as comissao')
+                            ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
+                            ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
+                            ->where('corretor.id', '=', $prop->corretor_id)
+                            ->where('real_percentual', '=', 0)
+                            ->whereRaw('perc_pago_inicio <= ' . $prop->perc_comissao)
+                            ->orderBy('real_percentual')
+                            ->orderBy('perc_pago_inicio', 'desc')
+                            ->first();
                     }
+                    
 
                     $producao = new Producao();
                     $producao->cpf = $prop->cpf;
@@ -457,19 +500,28 @@ class ProducaoController extends Controller
                     $producao->tabela = $prop->tabela;
                     $producao->fisicopendente = 'S';
                     $producao->data_fisico = $prop->data_fisico;
-                    $producao->perc_comissao = $prop->perc_comissao;
                     $producao->valor_contrato = $prop->valor_contrato;
                     $producao->valor_comissao = $prop->valor_comissao;
+                    if ($prop->dsc_tipo_comissao != 'PRÉ-ADESÃO') {
+                        $producao->perc_comissao = $prop->perc_comissao;
+                        $producao->corretor_perc_comissao = $corretor_perc_comissao;
+                        $producao->corretor_valor_comissao = $corretor_valor_comissao;
+                        $producao->correspondente_perc_comissao = $prop->perc_comissao - $corretor_perc_comissao;
+                        $producao->correspondente_valor_comissao = $prop->valor_comissao - $corretor_valor_comissao;    
+                    } else {
+                        $producao->em_real = 0;
+                        $producao->perc_comissao = 0;
+                        $producao->corretor_perc_comissao = 0;
+                        $producao->corretor_valor_comissao = $comissao;
+                        $producao->correspondente_perc_comissao = 0;
+                        $producao->correspondente_valor_comissao = $prop->valor_comissao - $comissao;    
+                    }
                     $producao->data_operacao = $prop->data_operacao;
                     $producao->data_credito_cliente = $prop->data_credito_cliente;
                     $producao->data_ncr = null;
                     $producao->data_importacao = $prop->data_importacao;
                     $producao->pago = 'N';
                     $producao->usuario = $prop->usuario;
-                    $producao->corretor_perc_comissao = $corretor_perc_comissao;
-                    $producao->corretor_valor_comissao = $corretor_valor_comissao;
-                    $producao->correspondente_perc_comissao = $prop->perc_comissao - $corretor_perc_comissao;
-                    $producao->correspondente_valor_comissao = $prop->valor_comissao - $corretor_valor_comissao;
                     $producao->corretor_id = $prop->corretor_id;
                     $producao->tipo = 'I';
                     $producao->save();

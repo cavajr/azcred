@@ -11,6 +11,8 @@ export class TabelaFiltro {
   convenio_id: number;
   tipo_id: number;
   perfil_id: number;
+  tabela: string;
+  prazo: string;
 }
 
 @Injectable({
@@ -42,6 +44,14 @@ export class TabelasService {
       params = params.append("perfil", filtro.perfil_id.toString());
     }
 
+    if (filtro.tabela) {
+      params = params.append("tabela", filtro.tabela);
+    }
+
+    if (filtro.prazo) {
+      params = params.append("prazo", filtro.prazo);
+    }
+
     return this.http
       .get<any>(`${this.tabelaUrl}`, { params })
       .toPromise()
@@ -49,8 +59,6 @@ export class TabelasService {
         return response;
       });
   }
-
-
 
   exportar(filtro: TabelaFiltro) {
     let params = new HttpParams({});

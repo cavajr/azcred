@@ -289,6 +289,9 @@ export class Producao {
   fisicopendente: string;
   pago: string;
   data_ncr: Date;
+  valor_comissao: number;
+  perc_comissao: number;
+  corretor_perc_comissao: number;
   corretor_valor_comissao: number;
   correspondente_valor_comissao: number;
   correspondente_perc_comissao: number;
@@ -296,6 +299,7 @@ export class Producao {
   operacao: string;
   pagamento_id: number;
   tipo: string;
+  em_real: number;
 }
 
 export class Remessa {

@@ -125,6 +125,20 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-md-9">
+                <div class="form-group">
+                  <label class="control-label">Tabela</label>
+                  <input class="form-control" type="text" #tabela="ngModel" name="tabela" [(ngModel)]="filtro.tabela" oninput="this.value = this.value.toUpperCase()">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="control-label">Prazo</label>
+                  <input class="form-control" type="text" #prazo="ngModel" name="prazo" [(ngModel)]="filtro.prazo" oninput="this.value = this.value.toUpperCase()">
+                </div>
+              </div>
+            </div>
           </div>
           <hr />
           <div class="form-actions">
@@ -150,7 +164,7 @@
     <div class="card">
       <div class="card-header">
         <strong>Listagem</strong>
-      </div>      
+      </div>
 
       <div class="card-body table-responsive" *ngIf="!auth.isCorretor()">
         <table
@@ -173,7 +187,7 @@
             </th>
             <th colspan="4" class="align-middle" style="text-align: center">
               COMISSÃO
-            </th>            
+            </th>
           </tr>
 
           <tr style="font-size: 0.8em;">
@@ -227,9 +241,9 @@
             </td>
             <td style="text-align: right">
               {{ tabela.comissao_bruto_correspondente | number: "1.2-2" }}
-            </td>            
+            </td>
           </tr>
-        </table>        
+        </table>
       </div>
     </div>
   </div>

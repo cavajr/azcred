@@ -57,16 +57,20 @@ class CorretorController extends Controller
             return response()->json($displayErrors, 422);
         }
 
-        if (strlen($dados['data_adm']) > 0) {
-            $dados['data_adm'] = Carbon::parse($dados['data_adm'])->format('Y-m-d');
-        } else {
-            $dados['data_adm'] = null;
+        if ($request->has('data_adm')) {
+            if (strlen($dados['data_adm']) > 0) {
+                $dados['data_adm'] = Carbon::parse($dados['data_adm'])->format('Y-m-d');
+            } else {
+                $dados['data_adm'] = null;
+            }
         }
 
-        if (strlen($dados['data_nasc']) > 0) {
-            $dados['data_nasc'] = Carbon::parse($dados['data_nasc'])->format('Y-m-d');
-        } else {
-            $dados['data_nasc'] = null;
+        if ($request->has('data_nasc')) {
+            if (strlen($dados['data_nasc']) > 0) {
+                $dados['data_nasc'] = Carbon::parse($dados['data_nasc'])->format('Y-m-d');
+            } else {
+                $dados['data_nasc'] = null;
+            }
         }
 
         DB::beginTransaction();
@@ -131,16 +135,20 @@ class CorretorController extends Controller
             return response()->json($displayErrors, 422);
         }
 
-        if (strlen($dados['data_adm']) > 0) {
-            $dados['data_adm'] = Carbon::parse($dados['data_adm'])->format('Y-m-d');
-        } else {
-            $dados['data_adm'] = null;
+        if ($request->has('data_adm')) {
+            if (strlen($dados['data_adm']) > 0) {
+                $dados['data_adm'] = Carbon::parse($dados['data_adm'])->format('Y-m-d');
+            } else {
+                $dados['data_adm'] = null;
+            }
         }
 
-        if (strlen($dados['data_nasc']) > 0) {
-            $dados['data_nasc'] = Carbon::parse($dados['data_nasc'])->format('Y-m-d');
-        } else {
-            $dados['data_nasc'] = null;
+        if ($request->has('data_nasc')) {
+            if (strlen($dados['data_nasc']) > 0) {
+                $dados['data_nasc'] = Carbon::parse($dados['data_nasc'])->format('Y-m-d');
+            } else {
+                $dados['data_nasc'] = null;
+            }
         }
 
         DB::beginTransaction();
@@ -182,7 +190,7 @@ class CorretorController extends Controller
         return response()->json(Corretor::orderBy('nome')->get());
     }
 
-     public function tabelas(Request $request)
+    public function tabelas(Request $request)
     {
         $this->authorize('ACESSO_CORRETOR');
 
@@ -193,6 +201,8 @@ class CorretorController extends Controller
         $banco = $request->all()['banco'] ?? null;
         $convenio = $request->all()['convenio'] ?? null;
         $tipo = $request->all()['tipo'] ?? null;
+        $tabela = $request->all()['tabela'] ?? null;
+        $prazo = $request->all()['prazo'] ?? null;
 
         // Cria tabela temporária para cálculo
         $file = time().'_temp';
@@ -229,6 +239,12 @@ class CorretorController extends Controller
             ->where('tabela_comissao.banco_id', '=', $banco)
             ->where('tabela_comissao.convenio_id', '=', $convenio)
             ->where('tabela_comissao.tipo_id', '=', $tipo)
+            ->when($tabela, function ($query, $tabela) {
+                $query->where('tabela_comissao.tabela', 'LIKE', "%{$tabela}%");
+            })
+            ->when($prazo, function ($query, $prazo) {
+                $query->where('tabela_comissao.prazo', 'LIKE', "%{$prazo}%");
+            })
             ->orderBy('tabela_comissao.banco_id')
             ->orderBy('tabela_comissao.convenio_id')
             ->orderBy('tabela_comissao.tipo_id')

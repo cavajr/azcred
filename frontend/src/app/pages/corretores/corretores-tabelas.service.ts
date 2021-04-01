@@ -11,6 +11,8 @@ export class CorretorTabelaFiltro {
   convenio_id: number;
   tipo_id: number;
   perfil_id: number;
+  tabela: string;
+  prazo: string;
 }
 
 @Injectable({
@@ -42,10 +44,18 @@ export class CorretoresTabelasService {
       params = params.append("perfil", filtro.perfil_id.toString());
     }
 
+    if (filtro.tabela) {
+      params = params.append("tabela", filtro.tabela);
+    }
+
+    if (filtro.prazo) {
+      params = params.append("prazo", filtro.prazo);
+    }
+
     return this.http
       .get<any>(`${this.tabelaUrl}`, { params })
       .toPromise()
-      .then(response => {        
+      .then(response => {
         return response
 
       });

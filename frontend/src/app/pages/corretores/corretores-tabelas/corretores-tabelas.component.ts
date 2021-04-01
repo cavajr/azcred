@@ -13,7 +13,7 @@ import { ToastrService } from "ngx-toastr";
 @Component({
   selector: "app-corretores-tabelas",
   templateUrl: "./corretores-tabelas.component.html",
-  styleUrls: ["./corretores-tabelas.component.scss"]
+  styleUrls: ["./corretores-tabelas.component.css"]
 })
 export class CorretoresTabelasComponent implements OnInit {
   listaBancos = [];

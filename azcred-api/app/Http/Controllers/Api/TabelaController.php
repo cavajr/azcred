@@ -21,9 +21,11 @@ class TabelaController extends Controller
         $convenio = $request->all()['convenio'] ?? null;
         $tipo = $request->all()['tipo'] ?? null;
         $perfil = $request->all()['perfil'] ?? null;
+        $tabela = $request->all()['tabela'] ?? null;
+        $prazo = $request->all()['prazo'] ?? null;
 
         // Cria tabela temporária para cálculo
-        $file = time().'_temp';
+        $file = time() . '_temp';
 
         Schema::create($file, function (Blueprint $table) {
             $table->integer('id');
@@ -57,6 +59,12 @@ class TabelaController extends Controller
             ->where('tabela_comissao.banco_id', '=', $banco)
             ->where('tabela_comissao.convenio_id', '=', $convenio)
             ->where('tabela_comissao.tipo_id', '=', $tipo)
+            ->when($tabela, function ($query, $tabela) {
+                $query->where('tabela_comissao.tabela', 'LIKE', "%{$tabela}%");
+            })
+            ->when($prazo, function ($query, $prazo) {
+                $query->where('tabela_comissao.prazo', 'LIKE', "%{$prazo}%");
+            })
             ->orderBy('tabela_comissao.banco_id')
             ->orderBy('tabela_comissao.convenio_id')
             ->orderBy('tabela_comissao.tipo_id')
@@ -78,9 +86,9 @@ class TabelaController extends Controller
             } else {
                 if ($tabela->comissao_liquido_sistema > 0) {
                     $comissao = Comissao::select('comissao')
-                        ->where('real_percentual', '=', 1)
+                        ->where('real_percentual', '=', $tabela->em_real)
                         ->where('perfil_id', '=', $perfil)
-                        ->whereRaw('perc_pago_inicio <= '.$tabela->comissao_liquido_sistema)
+                        ->whereRaw('perc_pago_inicio <= ' . $tabela->comissao_liquido_sistema)
                         ->orderBy('real_percentual')
                         ->orderBy('perc_pago_inicio', 'desc')
                         ->first();
@@ -94,12 +102,10 @@ class TabelaController extends Controller
                         $comissao_liquido_correspondente = $tabela->comissao_liquido_sistema;
                         $comissao_liquido_agente = 0.00;
                     } else {
-                        if ($valor_comissao === 0)
-                        {
+                        if ($valor_comissao === 0) {
                             $comissao_liquido_correspondente = $tabela->comissao_liquido_sistema;
-                            $comissao_liquido_agente = 0.00;    
-                        }
-                        else {
+                            $comissao_liquido_agente = 0.00;
+                        } else {
                             $comissao_liquido_agente = $resultado;
                             $comissao_liquido_correspondente = $valor_comissao;
                         }
@@ -107,9 +113,9 @@ class TabelaController extends Controller
                 }
                 if ($tabela->comissao_bruto_sistema > 0) {
                     $comissao = Comissao::select('comissao')
-                        ->where('real_percentual', '=', 1)
+                        ->where('real_percentual', '=', $tabela->em_real)
                         ->where('perfil_id', '=', $perfil)
-                        ->whereRaw('perc_pago_inicio <= '.$tabela->comissao_bruto_sistema)
+                        ->whereRaw('perc_pago_inicio <= ' . $tabela->comissao_bruto_sistema)
                         ->orderBy('real_percentual')
                         ->orderBy('perc_pago_inicio', 'desc')
                         ->first();
@@ -122,13 +128,11 @@ class TabelaController extends Controller
                     if ($valor_comissao >= $tabela->comissao_bruto_sistema) {
                         $comissao_bruto_correspondente = $tabela->comissao_bruto_sistema;
                         $comissao_bruto_agente = 0.00;
-                    } else {                        
-                        if ($valor_comissao === 0)
-                        {
+                    } else {
+                        if ($valor_comissao === 0) {
                             $comissao_bruto_correspondente = $tabela->comissao_bruto_sistema;
-                            $comissao_bruto_agente = 0.00;    
-                        }
-                        else {
+                            $comissao_bruto_agente = 0.00;
+                        } else {
                             $comissao_bruto_agente = $resultado;
                             $comissao_bruto_correspondente = $valor_comissao;
                         }

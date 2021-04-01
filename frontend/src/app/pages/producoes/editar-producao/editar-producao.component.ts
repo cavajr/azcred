@@ -65,19 +65,75 @@ export class EditarProducaoComponent implements OnInit {
     if (idContrato) {
       this.carregarContrato(idContrato);
     }
-    this.formulario.controls['corretor_perc_comissao'].valueChanges.subscribe(change => {
-      let perc_comissao = this.formulario.get('perc_comissao').value - this.formulario.get('corretor_perc_comissao').value;
-      this.formulario.patchValue({ correspondente_perc_comissao: perc_comissao });
-    });
+    this.formulario.controls["corretor_perc_comissao"].valueChanges.subscribe(
+      change => {
+        if (this.formulario.controls["em_real"].value == 1) {
+          let perc_comissao =
+            this.formulario.get("perc_comissao").value -
+            this.formulario.get("corretor_perc_comissao").value;
+            this.formulario.patchValue({
+              correspondente_perc_comissao: perc_comissao
+            });
+        }
+      }
+    );
+    this.formulario.controls["corretor_valor_comissao"].valueChanges.subscribe(
+      change => {
+        if (this.formulario.controls["em_real"].value == 0) {
+          let perc_comissao =
+            this.formulario.get("valor_contrato").value -
+            this.formulario.get("corretor_valor_comissao").value;
+            this.formulario.patchValue({
+              correspondente_valor_comissao: perc_comissao
+            });
+        }
+      }
+    );
+  }
+
+  ajustaComissao(event) {
+    this.blocked = true;
+    if (this.formulario.controls["corretor_id"].value) {
+      this.producoesService
+        .retornaComissao(
+          this.formulario.controls["corretor_id"].value,
+          this.formulario.controls["id"].value,
+          event
+        )
+        .then(comissao => {
+          this.blocked = false;
+          if (event == 1){
+            this.formulario.patchValue({ corretor_perc_comissao: comissao });
+          } else {
+            this.formulario.patchValue({ corretor_valor_comissao: comissao });
+          }
+        })
+        .catch(erro => {
+          this.blocked = false;
+          this.errorHandler.handle(erro);
+        });
+    } else {
+      this.blocked = false;
+      this.formulario.patchValue({ corretor_perc_comissao: 0.00 });
+
+    }
   }
 
   retornaComissao(event) {
     this.blocked = true;
     this.producoesService
-      .retornaComissao(event, this.formulario.controls["id"].value)
+      .retornaComissao(
+        event,
+        this.formulario.controls["id"].value,
+        this.formulario.controls["em_real"].value
+      )
       .then(comissao => {
         this.blocked = false;
-        this.formulario.patchValue({ corretor_perc_comissao: comissao });
+        if (this.formulario.controls["em_real"].value == 1) {
+          this.formulario.patchValue({ corretor_perc_comissao: comissao });
+        } else {
+          this.formulario.patchValue({ corretor_valor_comissao: comissao });
+        }
       })
       .catch(erro => {
         this.blocked = false;
@@ -107,9 +163,12 @@ export class EditarProducaoComponent implements OnInit {
       banco: [],
       valor_contrato: [],
       pago: [],
+      em_real: [1, Validators.required],
       valor_comissao: [],
       perc_comissao: [],
       correspondente_perc_comissao: [],
+      correspondente_valor_comissao: [],
+      corretor_valor_comissao: [],
       corretor_perc_comissao: [null, Validators.required],
       corretor_id: [null, Validators.required],
       fisicopendente: [null, Validators.required],

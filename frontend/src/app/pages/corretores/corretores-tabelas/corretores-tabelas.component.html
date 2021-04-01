@@ -101,6 +101,20 @@
                 </div>
               </div>
             </div>
+            <div class="row">
+              <div class="col-md-9">
+                <div class="form-group">
+                  <label class="control-label">Tabela</label>
+                  <input class="form-control" type="text" #tabela="ngModel" name="tabela" [(ngModel)]="filtro.tabela" oninput="this.value = this.value.toUpperCase()">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="control-label">Prazo</label>
+                  <input class="form-control" type="text" #prazo="ngModel" name="prazo" [(ngModel)]="filtro.prazo" oninput="this.value = this.value.toUpperCase()">
+                </div>
+              </div>
+            </div>
           </div>
           <hr />
           <div class="form-actions">
