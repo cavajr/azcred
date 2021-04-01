@@ -313,7 +313,7 @@ class ProducaoController extends Controller
     }
 
 
-    public function importaAmx(Request $request)
+   public function importaAmx(Request $request)
     {
         $this->authorize('IMPORTAR_PRODUCAO');
 
@@ -458,10 +458,11 @@ class ProducaoController extends Controller
                             ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
                             ->where('corretor.id', '=', $prop->corretor_id)
                             ->where('real_percentual', '=', 1)
-                            ->whereRaw('perc_pago_inicio <= ' . $prop->valor_contrato)
+                            ->whereRaw('perc_pago_inicio <= ' . $prop->perc_comissao)
                             ->orderBy('real_percentual')
                             ->orderBy('perc_pago_inicio', 'desc')
                             ->first();
+
                         if ($comissao) {
                             $valor_comissao = $comissao->comissao;
                             if ($prop->perc_comissao - $valor_comissao > 0) {
@@ -482,12 +483,24 @@ class ProducaoController extends Controller
                             ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
                             ->where('corretor.id', '=', $prop->corretor_id)
                             ->where('real_percentual', '=', 0)
-                            ->whereRaw('perc_pago_inicio <= ' . $prop->perc_comissao)
+                            ->whereRaw('perc_pago_inicio <= ' . $prop->valor_comissao)
                             ->orderBy('real_percentual')
                             ->orderBy('perc_pago_inicio', 'desc')
                             ->first();
+                        if ($comissao) {
+                            $valor_comissao = $comissao->comissao;
+                            if ($prop->perc_comissao - $valor_comissao > 0) {
+                                $corretor_valor_comissao = $prop->valor_contrato - $valor_comissao;
+                            } else {
+                                $corretor_perc_comissao = 0;
+                                $corretor_valor_comissao = 0;
+                            }
+                        } else {
+                            $valor_comissao = 0;
+                            $corretor_perc_comissao = 0;
+                            $corretor_valor_comissao = 0;
+                        }
                     }
-                    
 
                     $producao = new Producao();
                     $producao->cpf = $prop->cpf;
@@ -507,14 +520,14 @@ class ProducaoController extends Controller
                         $producao->corretor_perc_comissao = $corretor_perc_comissao;
                         $producao->corretor_valor_comissao = $corretor_valor_comissao;
                         $producao->correspondente_perc_comissao = $prop->perc_comissao - $corretor_perc_comissao;
-                        $producao->correspondente_valor_comissao = $prop->valor_comissao - $corretor_valor_comissao;    
+                        $producao->correspondente_valor_comissao = $prop->valor_comissao - $corretor_valor_comissao;
                     } else {
                         $producao->em_real = 0;
                         $producao->perc_comissao = 0;
                         $producao->corretor_perc_comissao = 0;
-                        $producao->corretor_valor_comissao = $comissao;
+                        $producao->corretor_valor_comissao = $corretor_valor_comissao;
                         $producao->correspondente_perc_comissao = 0;
-                        $producao->correspondente_valor_comissao = $prop->valor_comissao - $comissao;    
+                        $producao->correspondente_valor_comissao = $prop->valor_comissao - $valor_comissao;
                     }
                     $producao->data_operacao = $prop->data_operacao;
                     $producao->data_credito_cliente = $prop->data_credito_cliente;
