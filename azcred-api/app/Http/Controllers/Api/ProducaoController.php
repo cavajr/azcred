@@ -488,7 +488,7 @@ class ProducaoController extends Controller
                             ->orderBy('perc_pago_inicio', 'desc')
                             ->first();
                         if ($comissao) {
-                            $valor_comissao = $comissao->comissao;
+                            $valor_comissao = $comissao->comissao;                             
                             if ($prop->perc_comissao - $valor_comissao > 0) {
                                 $corretor_valor_comissao = $prop->valor_contrato - $valor_comissao;
                             } else {
@@ -527,7 +527,7 @@ class ProducaoController extends Controller
                         $producao->corretor_perc_comissao = 0;
                         $producao->corretor_valor_comissao = $corretor_valor_comissao;
                         $producao->correspondente_perc_comissao = 0;
-                        $producao->correspondente_valor_comissao = $prop->valor_comissao - $valor_comissao;
+                        $producao->correspondente_valor_comissao = $valor_comissao;
                     }
                     $producao->data_operacao = $prop->data_operacao;
                     $producao->data_credito_cliente = $prop->data_credito_cliente;
