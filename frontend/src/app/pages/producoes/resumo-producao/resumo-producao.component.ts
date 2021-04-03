@@ -26,6 +26,7 @@ import swal from "sweetalert";
 })
 export class ResumoProducaoComponent implements OnInit {
   oculto = "oculto";
+  blocked = false;
 
   bsConfig: Partial<BsDatepickerConfig>;
 
@@ -71,6 +72,7 @@ export class ResumoProducaoComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loading = false;
     this.carregarCorretores();
   }
 
@@ -122,5 +124,27 @@ export class ResumoProducaoComponent implements OnInit {
         }));
       })
       .catch(erro => this.errorHandler.handle(erro));
+  }
+
+  imprimirResumo() {
+    this.loading = true;
+    this.producoesService.imprimirResumo(this.filtro).subscribe(
+      relatorio => {
+        this.loading = false;
+        let file = new Blob([relatorio], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(file);
+        window.open(url);
+      },
+      error => {
+        this.loading = false;
+        if (error.status === 404) {
+          swal(
+            "Atenção",
+            "Nenhum dado encontrado para esse período !",
+            "warning"
+          );
+        }
+      }
+    );
   }
 }

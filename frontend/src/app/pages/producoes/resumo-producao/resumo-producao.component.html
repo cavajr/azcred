@@ -1,3 +1,7 @@
+<p-blockUI [blocked]="loading">
+  <i class="fa fa-lock fa-5x" style="position:absolute;top:50%;left:50%"></i>
+</p-blockUI>
+
 <div class="row">
   <div class="col-12">
     <div class="card border-info">
@@ -16,30 +20,6 @@
                 <input class="form-control" placeholder="Até" bsDatepicker [bsConfig]="bsConfig"
                   [(ngModel)]="filtro.ate" name="ate" #ate="ngModel"/>
               </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12 col-lg-3">
-              <div class="form-group">
-                <input
-                  placeholder="CPF"
-                  class="form-control"
-                  type="text"
-                  name="cpf"
-                  [(ngModel)]="filtro.cpf"
-                />
-              </div>
-            </div>
-            <div class="col-12 col-lg-9">
-              <div class="form-group">
-                <input
-                  placeholder="Cliente"
-                  class="form-control"
-                  type="text"
-                  name="cliente"
-                  [(ngModel)]="filtro.cliente"
-                />
               </div>
             </div>
           </div>
@@ -70,6 +50,10 @@
         <div class="card-footer">
           <button class="btn btn-sm btn-outline-success" type="submit" [disabled]="frm.invalid">
             <i class="fa fa-search-plus"></i> Pesquisar
+          </button>
+
+          <button class="btn btn-sm btn-primary ml-2" type="button" [disabled]="frm.invalid" (click)="imprimirResumo()">
+            <i class="fa fa-print"></i> Imprimir
           </button>
         </div>
       </form>

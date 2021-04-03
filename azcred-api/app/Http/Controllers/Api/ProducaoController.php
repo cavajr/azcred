@@ -555,4 +555,155 @@ class ProducaoController extends Controller
             return response()->json('Erro ao importar o arquivo', 422);
         }
     }
+
+    public function imprimirResumo(Request $request)
+    {
+        $this->authorize('VISUALIZAR_PRODUCAO');
+
+        $inicio = null;
+        $fim = null;
+
+        if (isset($request->all()['inicio'])) {
+            $inicio = Carbon::parse($request->all()['inicio'])->format('Y-m-d');
+        }
+
+        if (isset($request->all()['fim'])) {
+            $fim = Carbon::parse($request->all()['fim'])->format('Y-m-d');
+        }
+
+        $corretor = $request->all()['corretor'] ?? null;
+        $banco = $request->all()['banco'] ?? null;
+        $tabela = $request->all()['tabela'] ?? null;
+
+        // Total Importado
+        $query = DB::table('tabela_producao')
+            ->join('corretor', 'tabela_producao.corretor_id', '=', 'corretor.id')
+            ->where('tabela_producao.tipo', '=', 'I')
+            ->where('tabela_producao.pago', '=', 'S')
+            ->whereBetween('tabela_producao.data_ncr', [$inicio, $fim])
+            ->when($banco, function ($query, $banco) {
+                $query->where('tabela_producao.banco', 'LIKE', "%{$banco}%");
+            })
+            ->when($tabela, function ($query, $tabela) {
+                $query->where('tabela_producao.tabela', 'LIKE', "%{$tabela}%");
+            })
+            ->when($corretor, function ($query, $corretor) {
+                $query->where('tabela_producao.corretor_id', $corretor);
+            });
+
+        $total_contratos = $query->sum('tabela_producao.valor_contrato');
+        $total_valor_comissao = $query->sum('tabela_producao.valor_comissao');
+        $total_valor_agenteI = $query->sum('tabela_producao.corretor_valor_comissao');
+        $total_valor_empresa = $query->sum('tabela_producao.correspondente_valor_comissao');
+        // Fim Importado
+
+        // Total Manual
+        $query1 = DB::table('tabela_producao')
+            ->join('corretor', 'tabela_producao.corretor_id', '=', 'corretor.id')
+            ->where('tabela_producao.tipo', '=', 'M')
+            ->where('tabela_producao.pago', '=', 'S')
+            ->whereBetween('tabela_producao.data_ncr', [$inicio, $fim])
+            ->when($banco, function ($query, $banco) {
+                $query->where('tabela_producao.banco', 'LIKE', "%{$banco}%");
+            })
+            ->when($tabela, function ($query, $tabela) {
+                $query->where('tabela_producao.tabela', 'LIKE', "%{$tabela}%");
+            })
+            ->when($corretor, function ($query, $corretor) {
+                $query->where('tabela_producao.corretor_id', $corretor);
+            });
+
+        $total_valor_agenteM = $query1->sum('tabela_producao.corretor_valor_comissao');
+        // Fim Manual
+
+        // Total Geral Agente
+        $total_valor_agente = $total_valor_agenteI + $total_valor_agenteM;
+
+        $contratos = DB::table('tabela_producao')
+            ->join('corretor', 'tabela_producao.corretor_id', '=', 'corretor.id')
+            ->select(
+                'tabela_producao.*',
+                'corretor.nome as corretor'
+            )
+            ->where('tabela_producao.pago', '=', 'S')
+            ->whereBetween('tabela_producao.data_ncr', [$inicio, $fim])
+            ->when($banco, function ($query, $banco) {
+                $query->where('tabela_producao.banco', 'LIKE', "%{$banco}%");
+            })
+            ->when($tabela, function ($query, $tabela) {
+                $query->where('tabela_producao.tabela', 'LIKE', "%{$tabela}%");
+            })
+            ->when($corretor, function ($query, $corretor) {
+                $query->where('tabela_producao.corretor_id', $corretor);
+            })
+            ->orderBy('tabela_producao.id', 'DESC')
+            ->get();
+        
+            $periodo = '';
+            $periodo = 'PERÍODO: '.Carbon::parse($request->all()['inicio'])->format('d/m/Y').' à '.Carbon::parse($request->all()['fim'])->format('d/m/Y');
+        
+            $designer = new TPagamentos();
+            $designer->SetTitle(utf8_decode('Resumo de Produção'));
+            $designer->fromXml(app_path('Http/Controllers/Api/Relatorios/Formularios/extratoCorretor.pdf.xml'));
+            $designer->Dados_Header($periodo, 'Resumo de Produção');
+    
+            $designer->SetAutoPageBreak(true, 45);
+            $designer->generate();
+
+            $designer->SetFillColor(225, 210, 210);                                                    
+            $designer->SetFont('Arial', 'B', 8);
+            $designer->SetX(15);
+            $designer->SetFillColor(200, 200, 200);
+            $designer->Cell(70, 22, 'PROPOSTA', 1, 0, 'C', true);
+            $designer->Cell(80, 22, 'CPF', 1, 0, 'C', true);
+            $designer->Cell(130, 22, 'CLIENTE', 1, 0, 'C', true);
+            $designer->Cell(95, 22, utf8_decode('BANCO'), 1, 0, 'C', true);
+            $designer->Cell(70, 22, utf8_decode('R$ CONTRATO'), 1, 0, 'C', true);
+            $designer->Cell(50, 22, utf8_decode('% BANCO'), 1, 0, 'C', true);
+            $designer->Cell(70, 22, utf8_decode('R$ BANCO'), 1, 0, 'C', true);
+            $designer->Cell(50, 22, utf8_decode('% AGENTE'), 1, 0, 'C', true);
+            $designer->Cell(70, 22, utf8_decode('R$ AGENTE'), 1, 0, 'C', true);
+            $designer->Cell(55, 22, utf8_decode('% EMPRESA'), 1, 0, 'C', true);
+            $designer->Cell(70, 22, utf8_decode('R$ EMPRESA'), 1, 1, 'C', true);            
+
+            $designer->SetLineWidth(.4);
+            $designer->SetX(15);
+            foreach ($contratos as $contrato) {               
+    
+                $designer->SetFont('Arial', '', 8);
+                $designer->SetX(15);
+                $designer->Cell(70, 14, $contrato->proposta, 1, 0, 'C');
+                $designer->Cell(80, 14, $contrato->cpf, 1, 0, 'C');
+                $designer->Cell(130, 14, utf8_decode(substr($contrato->cliente, 0, 25)), 1, 0, 'L');
+                $designer->Cell(95, 14, utf8_decode(substr($contrato->banco, 0, 25)), 1, 0, 'L');
+                $designer->Cell(70, 14, number_format($contrato->valor_contrato, 2, ',', '.'), 1, 0, 'R');
+                $designer->Cell(50, 14, number_format($contrato->perc_comissao, 2, ',', '.'), 1, 0, 'R');
+                $designer->Cell(70, 14, number_format($contrato->valor_comissao, 2, ',', '.'), 1, 0, 'R');
+                $designer->Cell(50, 14, number_format($contrato->corretor_perc_comissao, 2, ',', '.'), 1, 0, 'R');
+                $designer->Cell(70, 14, number_format($contrato->corretor_valor_comissao, 2, ',', '.'), 1, 0, 'R');
+                $designer->Cell(55, 14, number_format($contrato->correspondente_perc_comissao, 2, ',', '.'), 1, 0, 'R');
+                $designer->Cell(70, 14, number_format($contrato->correspondente_valor_comissao, 2, ',', '.'), 1, 1, 'R');
+            }
+    
+            $designer->SetFillColor(117, 117, 117);
+            $designer->SetX(15);
+            $designer->SetFont('Arial', 'B', 8);
+            $designer->Cell(375, 22, 'TOTAL GERAL', 1, 0, 'L', true);
+            $designer->Cell(70, 22, number_format($total_contratos, 2, ',', '.'), 1, 0, 'R', true);
+            $designer->Cell(50, 22, '--------', 1, 0, 'C', true);
+            $designer->Cell(70, 22, number_format($total_valor_comissao, 2, ',', '.'), 1, 0, 'R', true);
+            $designer->Cell(50, 22, '--------', 1, 0, 'C', true);
+            $designer->Cell(70, 22, number_format($total_valor_agente, 2, ',', '.'), 1, 0, 'R', true);
+            $designer->Cell(55, 22, '--------', 1, 0, 'C', true);
+            $designer->Cell(70, 22, number_format($total_valor_empresa, 2, ',', '.'), 1, 1, 'R', true);
+
+            $file = time().'_resumo_pagamento.pdf';
+            if (!file_exists($file) or is_writable($file)) {
+                header('Access-Control-Allow-Headers: Origin, Content-Type');
+                header('Content-Type: application/pdf');
+                $designer->output('I', $file);
+            } else {
+                return response()->json(['erro' => 'Problemas ao criar arquivo'], 404);
+            }              
+    }
 }

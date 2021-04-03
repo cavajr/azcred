@@ -75,6 +75,7 @@ Route::group(['middleware' => ['jwt.auth', 'cors'], 'namespace' => 'Api\\'], fun
     // Producao
     Route::get('producoes', 'ProducaoController@index');
     Route::get("producoes/resumo", "ProducaoController@resumo");
+    Route::get("producoes/imprimir-resumo", "ProducaoController@imprimirResumo");
     Route::post('producoes', 'ProducaoController@store');
     Route::get('producoes/{id}', 'ProducaoController@show');
     Route::put('producoes/{id}', 'ProducaoController@update');

@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
-import { HttpParams } from "@angular/common/http";
+import { HttpParams, HttpHeaders } from "@angular/common/http";
 
 import "rxjs/add/operator/toPromise";
+import "rxjs/add/operator/map";
 
 import { SistemaHttp } from "../../seguranca/sistema-http";
 
@@ -270,5 +271,54 @@ export class ProducoesService {
         contrato.data_ncr = moment(contrato.data_ncr, "YYYY-MM-DD").toDate();
       }
     }
+  }
+
+  imprimirResumo(filtro: ResumoFiltro) {
+    let params = new HttpParams({
+      fromObject: {
+        page: filtro.pagina.toString()
+      }
+    });
+
+    if (filtro.cpf) {
+      params = params.append("cpf", filtro.cpf.toString());
+    }
+
+    if (filtro.cliente) {
+      params = params.append("cliente", filtro.cliente.toString());
+    }
+
+    if (filtro.banco) {
+      params = params.append("banco", filtro.banco.toString());
+    }
+
+    if (filtro.tabela) {
+      params = params.append("tabela", filtro.tabela.toString());
+    }
+
+    if (filtro.corretor) {
+      params = params.append("corretor", filtro.corretor.toString());
+    }
+
+    if (filtro.de) {
+      params = params.append("inicio", moment(filtro.de).format("YYYY-MM-DD"));
+    }
+
+    if (filtro.ate) {
+      params = params.append("fim", moment(filtro.ate).format("YYYY-MM-DD"));
+    }
+
+    let headers = new HttpHeaders();
+    headers = headers.set("Content-Type", "application/json; charset=utf-8");
+
+    return this.http
+      .get(`${this.producoesUrl}/imprimir-resumo`, {
+        headers,
+        params,
+        responseType: "blob"
+      })
+      .map((res: any) => {
+        return res;
+      });
   }
 }
