@@ -2,17 +2,15 @@ import { Injectable } from "@angular/core";
 import { HttpHeaders, HttpParams } from "@angular/common/http";
 
 import "rxjs/add/operator/toPromise";
-import 'rxjs/add/operator/map';
+import "rxjs/add/operator/map";
 
 import { SistemaHttp } from "../../seguranca/sistema-http";
 import { environment } from "../../../environments/environment";
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root"
 })
 export class PagamentosService {
-
   pagamentoUrl: string;
 
   constructor(public http: SistemaHttp) {

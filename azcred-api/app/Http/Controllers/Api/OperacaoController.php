@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Producao;
 use App\Traits\ApiResponser;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class OperacaoController extends Controller
 {
@@ -89,7 +89,6 @@ class OperacaoController extends Controller
 
             return response()->json($displayErrors, 422);
         }
-
         $producao = new Producao();
         $producao->cpf = '********';
         $producao->contrato = '********';
@@ -113,6 +112,7 @@ class OperacaoController extends Controller
         $producao->tipo = 'M';
         $producao->operacao = $dados['operacao'];
         $producao->save();
+
         return response()->json($producao, 201);
     }
 

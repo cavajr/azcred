@@ -12,12 +12,13 @@ use App\Models\Tabela;
 use App\Traits\ApiResponser;
 use App\User;
 use Carbon\Carbon;
-use DB;
 use Excel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 
 class CorretorController extends Controller
 {
@@ -204,8 +205,8 @@ class CorretorController extends Controller
         $tabela = $request->all()['tabela'] ?? null;
         $prazo = $request->all()['prazo'] ?? null;
 
-        // Cria tabela temporária para cálculo
-        $file = time().'_temp';
+        // Cria tabela temporária para cálculo        
+        $file = time() . '_temp';
 
         Schema::create($file, function (Blueprint $table) {
             $table->integer('id');
@@ -216,13 +217,16 @@ class CorretorController extends Controller
             $table->date('vigencia')->nullable(true);
             $table->string('prazo')->nullable(true);
             $table->integer('sistema_id');
-            $table->float('comissao_geral_sistema', 9, 2);
-            $table->float('comissao_liquido_sistema', 9, 2);
-            $table->float('comissao_bruto_sistema', 9, 2);
-            $table->float('comissao_liquido_agente', 9, 2);
-            $table->float('comissao_liquido_correspondente', 9, 2);
-            $table->float('comissao_bruto_agente', 9, 2);
-            $table->float('comissao_bruto_correspondente', 9, 2);
+            $table->float('comissao_geral_sistema_moeda', 9, 2);
+            $table->float('comissao_agente_moeda', 9, 2);
+            $table->float('comissao_correspondente_moeda', 9, 2);
+            $table->float('comissao_geral_sistema_percentual', 9, 2);
+            $table->float('comissao_liquido_sistema_percentual', 9, 2);
+            $table->float('comissao_bruto_sistema_percentual', 9, 2);
+            $table->float('comissao_liquido_agente_percentual', 9, 2);
+            $table->float('comissao_liquido_correspondente_percentual', 9, 2);
+            $table->float('comissao_bruto_agente_percentual', 9, 2);
+            $table->float('comissao_bruto_correspondente_percentual', 9, 2);
             $table->string('codigo_mg')->nullable(true);
         });
         // Fim da criação
@@ -248,52 +252,53 @@ class CorretorController extends Controller
             ->orderBy('tabela_comissao.banco_id')
             ->orderBy('tabela_comissao.convenio_id')
             ->orderBy('tabela_comissao.tipo_id')
-            ->orderBy('tabela_comissao.comissao_geral_sistema', 'desc')
+            ->orderBy('tabela_comissao.comissao_geral_sistema_moeda', 'desc')
+            ->orderBy('tabela_comissao.comissao_geral_sistema_percentual', 'desc')
             ->get();
 
         foreach ($tabelas as $tabela) {
-            $comissao_liquido_agente = 0.00;
-            $comissao_liquido_correspondente = 0.00;
-            $comissao_bruto_agente = 0.00;
-            $comissao_bruto_correspondente = 0.00;
+            $comissao_agente_moeda = 0;
+            $comissao_correspondente_moeda = 0;
+            $comissao_liquido_agente_percentual = 0.00;
+            $comissao_liquido_correspondente_percentual = 0.00;
+            $comissao_bruto_agente_percentual = 0.00;
+            $comissao_bruto_correspondente_percentual = 0.00;
             $valor_comissao = 0.00;
 
-            if (($tabela->comissao_liquido_sistema === 0) && ($tabela->comissao_bruto_sistema === 0)) {
-                $comissao_liquido_agente = 0.00;
-                $comissao_liquido_correspondente = 0.00;
-                $comissao_bruto_agente = 0.00;
-                $comissao_bruto_correspondente = 0.00;
-            } else {
-                if ($tabela->comissao_liquido_sistema > 0) {
-                    $comissao = Comissao::select('comissao')
-                        ->where('real_percentual', '=', 1)
-                        ->where('perfil_id', '=', $perfil)
-                        ->whereRaw('perc_pago_inicio <= '.$tabela->comissao_liquido_sistema)
-                        ->orderBy('real_percentual')
-                        ->orderBy('perc_pago_inicio', 'desc')
-                        ->first();
-                    if ($comissao) {
-                        $valor_comissao = $comissao->comissao;
+            if ($tabela->comissao_geral_sistema_moeda > 0) {
+                $comissao = Comissao::select('comissao')
+                    ->where('real_percentual', '=', 0)
+                    ->where('perfil_id', '=', $perfil)
+                    ->whereRaw('perc_pago_inicio <= ' . $tabela->comissao_geral_sistema_moeda)
+                    ->orderBy('real_percentual')
+                    ->orderBy('perc_pago_inicio', 'desc')
+                    ->first();
+                if ($comissao) {
+                    $valor_comissao = $comissao->comissao;
+                } else {
+                    $valor_comissao = 0;
+                }
+                $resultado = $tabela->comissao_geral_sistema_moeda - $valor_comissao;
+                if ($valor_comissao >= $tabela->comissao_geral_sistema_moeda) {
+                    $comissao_correspondente_moeda = $tabela->comissao_geral_sistema_moeda;
+                    $comissao_agente_moeda = 0.00;
+                } else {
+                    if ($valor_comissao === 0) {
+                        $comissao_correspondente_moeda = $tabela->comissao_geral_sistema_moeda;
+                        $comissao_agente_moeda = 0.00;
                     } else {
-                        $valor_comissao = 0;
-                    }
-                    if ($valor_comissao > $tabela->comissao_liquido_sistema) {
-                        $comissao_liquido_correspondente = $tabela->comissao_liquido_sistema;
-                    } else {
-                        $comissao_liquido_correspondente = $valor_comissao;
-                    }
-                    $resultado = $tabela->comissao_liquido_sistema - $valor_comissao;
-                    if ($resultado > 0) {
-                        $comissao_liquido_agente = $resultado;
-                    } else {
-                        $comissao_liquido_agente = 0.00;
+                        $comissao_agente_moeda = $resultado;
+                        $comissao_correspondente_moeda = $valor_comissao;
                     }
                 }
-                if ($tabela->comissao_bruto_sistema > 0) {
+            }
+
+            if ($tabela->comissao_geral_sistema_percentual > 0) {
+                if ($tabela->comissao_liquido_sistema_percentual > 0) {
                     $comissao = Comissao::select('comissao')
                         ->where('real_percentual', '=', 1)
                         ->where('perfil_id', '=', $perfil)
-                        ->whereRaw('perc_pago_inicio <= '.$tabela->comissao_bruto_sistema)
+                        ->whereRaw('perc_pago_inicio <= ' . $tabela->comissao_liquido_sistema_percentual)
                         ->orderBy('real_percentual')
                         ->orderBy('perc_pago_inicio', 'desc')
                         ->first();
@@ -302,16 +307,45 @@ class CorretorController extends Controller
                     } else {
                         $valor_comissao = 0;
                     }
-                    if ($valor_comissao > $tabela->comissao_bruto_sistema) {
-                        $comissao_bruto_correspondente = $tabela->comissao_bruto_sistema;
+                    $resultado = $tabela->comissao_liquido_sistema_percentual - $valor_comissao;
+                    if ($valor_comissao >= $tabela->comissao_liquido_sistema_percentual) {
+                        $comissao_liquido_correspondente_percentual = $tabela->comissao_liquido_sistema_percentual;
+                        $comissao_liquido_agente_percentual = 0.00;
                     } else {
-                        $comissao_bruto_correspondente = $valor_comissao;
+                        if ($valor_comissao === 0) {
+                            $comissao_liquido_correspondente_percentual = $tabela->comissao_liquido_sistema_percentual;
+                            $comissao_liquido_agente_percentual = 0.00;
+                        } else {
+                            $comissao_liquido_agente_percentual = $resultado;
+                            $comissao_liquido_correspondente_percentual = $valor_comissao;
+                        }
                     }
-                    $resultado = $tabela->comissao_bruto_sistema - $valor_comissao;
-                    if ($resultado > 0) {
-                        $comissao_bruto_agente = $resultado;
+                }
+                if ($tabela->comissao_bruto_sistema_percentual > 0) {
+                    $comissao = Comissao::select('comissao')
+                        ->where('real_percentual', '=', 1)
+                        ->where('perfil_id', '=', $perfil)
+                        ->whereRaw('perc_pago_inicio <= ' . $tabela->comissao_bruto_sistema_percentual)
+                        ->orderBy('real_percentual')
+                        ->orderBy('perc_pago_inicio', 'desc')
+                        ->first();
+                    if ($comissao) {
+                        $valor_comissao = $comissao->comissao;
                     } else {
-                        $comissao_bruto_agente = 0.00;
+                        $valor_comissao = 0;
+                    }
+                    $resultado = $tabela->comissao_bruto_sistema_percentual - $valor_comissao;
+                    if ($valor_comissao >= $tabela->comissao_bruto_sistema_percentual) {
+                        $comissao_bruto_correspondente_percentual = $tabela->comissao_bruto_sistema_percentual;
+                        $comissao_bruto_agente_percentual = 0.00;
+                    } else {
+                        if ($valor_comissao === 0) {
+                            $comissao_bruto_correspondente_percentual = $tabela->comissao_bruto_sistema_percentual;
+                            $comissao_bruto_agente_percentual = 0.00;
+                        } else {
+                            $comissao_bruto_agente_percentual = $resultado;
+                            $comissao_bruto_correspondente_percentual = $valor_comissao;
+                        }
                     }
                 }
             }
@@ -326,14 +360,17 @@ class CorretorController extends Controller
                     'vigencia' => $tabela->vigencia,
                     'prazo' => $tabela->prazo,
                     'sistema_id' => $tabela->sistema_id,
-                    'comissao_geral_sistema' => $tabela->comissao_geral_sistema,
-                    'comissao_liquido_sistema' => $tabela->comissao_liquido_sistema,
-                    'comissao_bruto_sistema' => $tabela->comissao_bruto_sistema,
-                    'comissao_liquido_agente' => $comissao_liquido_agente,
-                    'comissao_liquido_correspondente' => $comissao_liquido_correspondente,
-                    'comissao_bruto_agente' => $comissao_bruto_agente,
-                    'comissao_bruto_correspondente' => $comissao_bruto_correspondente,
-                    'codigo_mg' => $tabela->codigo_mg,
+                    'comissao_geral_sistema_moeda' => $tabela->comissao_geral_sistema_moeda,
+                    'comissao_agente_moeda' => $comissao_agente_moeda,
+                    'comissao_correspondente_moeda' => $comissao_correspondente_moeda,
+                    'comissao_geral_sistema_percentual' => $tabela->comissao_geral_sistema_percentual,
+                    'comissao_liquido_sistema_percentual' => $tabela->comissao_liquido_sistema_percentual,
+                    'comissao_bruto_sistema_percentual' => $tabela->comissao_bruto_sistema_percentual,
+                    'comissao_liquido_agente_percentual' => $comissao_liquido_agente_percentual,
+                    'comissao_liquido_correspondente_percentual' => $comissao_liquido_correspondente_percentual,
+                    'comissao_bruto_agente_percentual' => $comissao_bruto_agente_percentual,
+                    'comissao_bruto_correspondente_percentual' => $comissao_bruto_correspondente_percentual,
+                    'codigo_mg' => $tabela->codigo_mg
                 ]
             );
         }
@@ -401,7 +438,7 @@ class CorretorController extends Controller
         $tipo = $request->all()['tipo'] ?? null;
 
         // Cria tabela temporária para cálculo
-        $file = time().'_temp';
+        $file = time() . '_temp';
 
         Schema::create($file, function (Blueprint $table) {
             $table->integer('id');
@@ -434,7 +471,7 @@ class CorretorController extends Controller
             )
             ->where('tabela_comissao.banco_id', '=', $banco)
             ->where('tabela_comissao.convenio_id', '=', $convenio)
-            ->where('tabela_comissao.tipo_id', '=', $tipo)            
+            ->where('tabela_comissao.tipo_id', '=', $tipo)
             ->orderBy('tabela_comissao.banco_id')
             ->orderBy('tabela_comissao.convenio_id')
             ->orderBy('tabela_comissao.tipo_id')
@@ -458,7 +495,7 @@ class CorretorController extends Controller
                     $valor_comissao = Comissao::select('comissao')
                         ->where('real_percentual', '=', 1)
                         ->where('perfil_id', '=', $perfil)
-                        ->whereRaw('perc_pago_inicio <= '.$tabela->comissao_liquido_sistema)
+                        ->whereRaw('perc_pago_inicio <= ' . $tabela->comissao_liquido_sistema)
                         ->orderBy('real_percentual')
                         ->orderBy('perc_pago_inicio', 'desc')
                         ->first();
@@ -469,7 +506,7 @@ class CorretorController extends Controller
                     $valor_comissao = Comissao::select('comissao')
                         ->where('real_percentual', '=', 1)
                         ->where('perfil_id', '=', $perfil)
-                        ->whereRaw('perc_pago_inicio <= '.$tabela->comissao_bruto_sistema)
+                        ->whereRaw('perc_pago_inicio <= ' . $tabela->comissao_bruto_sistema)
                         ->orderBy('real_percentual')
                         ->orderBy('perc_pago_inicio', 'desc')
                         ->first();

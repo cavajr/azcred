@@ -11,9 +11,7 @@ import swal from "sweetalert";
 })
 export class PagamentosListaComponent implements OnInit {
   corretores = [];
-
   selecionados = [];
-
   tarifas = [];
 
   totalComissao = 0;
@@ -33,8 +31,10 @@ export class PagamentosListaComponent implements OnInit {
     this.pagamentoService
       .pagar(this.selecionados)
       .then(resultado => {
-        if (resultado.status === 'OK') {
-          const selected = this.selecionados.filter(x => x.contratos.id).map(x => x.contratos.id);
+        if (resultado.status === "OK") {
+          const selected = this.selecionados
+            .filter(x => x.contratos.id)
+            .map(x => x.contratos.id);
           swal("Sucesso", "Pagamento efetuado com sucesso!", "success");
           this.gerar(selected);
           this.selecionados = [];

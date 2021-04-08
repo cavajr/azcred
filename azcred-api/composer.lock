@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "73914f6c2d178de1ebf28e8da4a0b473",
+    "content-hash": "18689db15379cbef31a76561fe0842b8",
     "packages": [
         {
             "name": "anahkiasen/underscore-php",
@@ -471,16 +471,16 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "3.1.0",
+            "version": "3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "62c3b73c581c834885acf6e120b412b76acc495a"
+                "reference": "c81f18a3efb941d8c4d2e025f6183b5c6d697307"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/62c3b73c581c834885acf6e120b412b76acc495a",
-                "reference": "62c3b73c581c834885acf6e120b412b76acc495a",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/c81f18a3efb941d8c4d2e025f6183b5c6d697307",
+                "reference": "c81f18a3efb941d8c4d2e025f6183b5c6d697307",
                 "shasum": ""
             },
             "require": {
@@ -527,7 +527,7 @@
             ],
             "support": {
                 "issues": "https://github.com/egulias/EmailValidator/issues",
-                "source": "https://github.com/egulias/EmailValidator/tree/3.1.0"
+                "source": "https://github.com/egulias/EmailValidator/tree/3.1.1"
             },
             "funding": [
                 {
@@ -535,7 +535,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-07T14:33:28+00:00"
+            "time": "2021-04-01T18:37:14+00:00"
         },
         {
             "name": "erusev/parsedown",
@@ -4279,6 +4279,114 @@
                 }
             ],
             "time": "2021-01-20T14:39:13+00:00"
+        },
+        {
+            "name": "wilgucki/csv",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wilgucki/csv.git",
+                "reference": "c740a98b53e224958818ca1a82f313ce25162ca8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wilgucki/csv/zipball/c740a98b53e224958818ca1a82f313ce25162ca8",
+                "reference": "c740a98b53e224958818ca1a82f313ce25162ca8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0",
+                "wilgucki/php-csv": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Wilgucki\\Csv\\CsvServiceProvider"
+                    ],
+                    "aliases": {
+                        "CsvReader": "Wilgucki\\Csv\\Facades\\Reader",
+                        "CsvWriter": "Wilgucki\\Csv\\Facades\\Writer"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wilgucki\\Csv\\": "src",
+                    "Wilgucki\\Csv\\Test\\": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maciej Wilgucki",
+                    "email": "mwilgucki@gmail.com"
+                }
+            ],
+            "description": "Laravel 5 package for writing and reading CSV files",
+            "keywords": [
+                "csv",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/wilgucki/csv/issues",
+                "source": "https://github.com/wilgucki/csv/tree/v1"
+            },
+            "time": "2018-07-15T11:27:43+00:00"
+        },
+        {
+            "name": "wilgucki/php-csv",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wilgucki/php-csv.git",
+                "reference": "a6759ecc2ee42348f989dce0688f6c9dd02b1b96"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wilgucki/php-csv/zipball/a6759ecc2ee42348f989dce0688f6c9dd02b1b96",
+                "reference": "a6759ecc2ee42348f989dce0688f6c9dd02b1b96",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Wilgucki\\PhpCsv\\": "src",
+                    "Wilgucki\\PhpCsv\\Tests\\": "tests"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Maciej Wilgucki",
+                    "email": "mwilgucki@gmail.com"
+                }
+            ],
+            "description": "Object oriented way of managing CSV files",
+            "keywords": [
+                "csv",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/wilgucki/php-csv/issues",
+                "source": "https://github.com/wilgucki/php-csv/tree/master"
+            },
+            "time": "2018-07-15T10:37:15+00:00"
         }
     ],
     "packages-dev": [
@@ -4353,16 +4461,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.10.0",
+            "version": "2.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "6ecda5217bf048088b891f7403b262906be5a957"
+                "reference": "d501fd2658d55491a2295ff600ae5978eaad7403"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/6ecda5217bf048088b891f7403b262906be5a957",
-                "reference": "6ecda5217bf048088b891f7403b262906be5a957",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/d501fd2658d55491a2295ff600ae5978eaad7403",
+                "reference": "d501fd2658d55491a2295ff600ae5978eaad7403",
                 "shasum": ""
             },
             "require": {
@@ -4412,7 +4520,7 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.10.0"
+                "source": "https://github.com/filp/whoops/tree/2.12.0"
             },
             "funding": [
                 {
@@ -4420,7 +4528,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-16T12:00:00+00:00"
+            "time": "2021-03-30T12:00:00+00:00"
         },
         {
             "name": "fzaninotto/faker",

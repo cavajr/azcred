@@ -52,10 +52,8 @@
                     >{{ corretor.nome }}</ng-option
                   >
                 </ng-select>
-
               </div>
             </div>
-
           </div>
           <div class="row">
             <div class="col-12 col-lg-3">
@@ -143,14 +141,21 @@
               <td>{{ operacao.data_importacao | date: "dd/MM/yyyy" }}</td>
               <td>{{ operacao.cliente }}</td>
               <td>{{ operacao.corretor }}</td>
-              <td style="text-align: right; color: blue;" *ngIf="operacao.valor_contrato > 0">
-                {{ operacao.valor_contrato | number: "1.2-2" }}
+              <td
+                style="text-align: right; color: blue;"
+                *ngIf="operacao.corretor_valor_comissao > 0"
+              >
+                {{ operacao.corretor_valor_comissao | number: "1.2-2" }}
               </td>
-              <td style="text-align: right; color: red;" *ngIf="operacao.valor_contrato < 0">
-                {{ operacao.valor_contrato | number: "1.2-2" }}
+              <td
+                style="text-align: right; color: red;"
+                *ngIf="operacao.corretor_valor_comissao < 0"
+              >
+                {{ operacao.corretor_valor_comissao | number: "1.2-2" }}
               </td>
               <td style="width: 80px; text-align: center;">
                 <button
+                  *ngIf="operacao.pago != 'S'"
                   pButton
                   class="ui-button-danger"
                   icon="pi pi-trash"

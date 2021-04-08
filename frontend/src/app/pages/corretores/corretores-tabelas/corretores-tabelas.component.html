@@ -105,13 +105,27 @@
               <div class="col-md-9">
                 <div class="form-group">
                   <label class="control-label">Tabela</label>
-                  <input class="form-control" type="text" #tabela="ngModel" name="tabela" [(ngModel)]="filtro.tabela" oninput="this.value = this.value.toUpperCase()">
+                  <input
+                    class="form-control"
+                    type="text"
+                    #tabela="ngModel"
+                    name="tabela"
+                    [(ngModel)]="filtro.tabela"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group">
                   <label class="control-label">Prazo</label>
-                  <input class="form-control" type="text" #prazo="ngModel" name="prazo" [(ngModel)]="filtro.prazo" oninput="this.value = this.value.toUpperCase()">
+                  <input
+                    class="form-control"
+                    type="text"
+                    #prazo="ngModel"
+                    name="prazo"
+                    [(ngModel)]="filtro.prazo"
+                    oninput="this.value = this.value.toUpperCase()"
+                  />
                 </div>
               </div>
             </div>
@@ -149,45 +163,48 @@
         <table
           class="table table-condensed table-bordered table-hover table-responsive-sm"
         >
-          <tr style="font-size: 0.8em;">
-            <th rowspan="2" class="align-middle">CÓDIGO</th>
-            <th rowspan="2" class="align-middle">BANCO</th>
-            <th rowspan="2" class="align-middle">CONVÊNIO</th>
-            <th rowspan="2" class="align-middle">TIPO</th>
-            <th rowspan="2" class="align-middle">TABELA</th>
-            <th rowspan="2" class="align-middle" style="text-align: center;">
-              VIGÊNCIA
-            </th>
-            <th rowspan="2" class="align-middle" style="text-align: center;">
-              PRAZO
-            </th>
-            <th colspan="2" class="align-middle" style="text-align: center">
-              COMISSÃO
-            </th>
-          </tr>
+          <thead>
+            <tr style="font-size: 0.8em;">
+              <th rowspan="2" class="align-middle">CÓDIGO</th>
+              <th rowspan="2" class="align-middle">TABELA</th>
+              <th rowspan="2" class="align-middle" style="text-align: center;">
+                VIGÊNCIA
+              </th>
+              <th rowspan="2" class="align-middle" style="text-align: center;">
+                PRAZO
+              </th>
+              <th colspan="3" class="align-middle" style="text-align: center">
+                COMISSÃO
+              </th>
+            </tr>
 
-          <tr style="font-size: 0.8em;">
-            <th style="text-align: center;">Líquido</th>
-            <th style="text-align: center;">Bruto</th>
-          </tr>
-
-          <tr style="font-size: 0.8em;" *ngFor="let tabela of tabelas">
-            <td>{{ tabela.codigo_mg }}</td>
-            <td>{{ tabela.banco }}</td>
-            <td>{{ tabela.convenio }}</td>
-            <td>{{ tabela.tipo }}</td>
-            <td>{{ tabela.tabela }}</td>
-            <td style="text-align: center;">
-              {{ tabela.vigencia | date: "dd/MM/yyyy" }}
-            </td>
-            <td style="text-align: center;">{{ tabela.prazo }}</td>
-            <td style="text-align: right">
-              {{ tabela.comissao_liquido_agente | number: "1.2-2" }}
-            </td>
-            <td style="text-align: right">
-              {{ tabela.comissao_bruto_agente | number: "1.2-2" }}
-            </td>
-          </tr>
+            <tr style="font-size: 0.8em;">
+              <th style="text-align: center;">Líquido %</th>
+              <th style="text-align: center;">Bruto %</th>
+              <th style="text-align: center;">Fixo R$</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="font-size: 0.8em;" *ngFor="let tabela of tabelas">
+              <td>{{ tabela.codigo_mg }}</td>
+              <td>{{ tabela.tabela }}</td>
+              <td style="text-align: center;">
+                {{ tabela.vigencia | date: "dd/MM/yyyy" }}
+              </td>
+              <td style="text-align: center;">{{ tabela.prazo }}</td>
+              <td style="text-align: right">
+                {{
+                  tabela.comissao_liquido_agente_percentual | number: "1.2-2"
+                }}
+              </td>
+              <td style="text-align: right">
+                {{ tabela.comissao_bruto_agente_percentual | number: "1.2-2" }}
+              </td>
+              <td style="text-align: right">
+                {{ tabela.comissao_agente_moeda | number: "1.2-2" }}
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
     </div>

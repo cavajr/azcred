@@ -81,13 +81,31 @@ export class FinanceiroService {
     return this.http
       .put<any>(`${this.fincanceiroUrl}/${financeiro.id}`, financeiro)
       .toPromise()
-      .then(response => response as Financeiro);
+      .then(response => {
+        const contratoAlterado = response;
+
+        this.converterStringsParaDatas([contratoAlterado]);
+
+        return contratoAlterado;
+      });
   }
 
   buscarPorCodigo(id: number): Promise<Financeiro> {
     return this.http
       .get<any>(`${this.fincanceiroUrl}/${id}`)
       .toPromise()
-      .then(response => response as Financeiro);
+      .then(response => {
+        const contratoAlterado = response;
+
+        this.converterStringsParaDatas([contratoAlterado]);
+
+        return contratoAlterado;
+      });
+  }
+
+  private converterStringsParaDatas(movimentos: any[]) {
+    for (const movimento of movimentos) {
+      movimento.data_mov = moment(movimento.data_mov, "YYYY-MM-DD").toDate();
+    }
   }
 }

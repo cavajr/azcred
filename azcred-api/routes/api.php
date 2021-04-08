@@ -7,6 +7,8 @@ Route::get('auth/refresh', 'Api\AuthController@refresh');
 Route::get('auth/logout', 'Api\AuthController@logout');
 Route::get('config/{id}/logo', "Api\ConfigController@showLogo");
 
+Route::get('/atualiza-financeiro', 'Api\PagamentoController@atualizaFinanceiro');
+
 Route::group(['middleware' => ['jwt.auth', 'cors'], 'namespace' => 'Api\\'], function () {
     Route::get('dashboard', 'DashboardController@index');
 

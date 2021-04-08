@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\Relatorios\Implementacoes\TPagamentos;
+use App\Models\Movimento;
 use App\Models\Producao;
 use App\Traits\ApiResponser;
 use Carbon\Carbon;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+
 
 class ProducaoController extends Controller
 {
@@ -234,11 +237,11 @@ class ProducaoController extends Controller
                 ->orderBy('configuracao_comissao.real_percentual')
                 ->orderBy('configuracao_comissao.perc_pago_inicio', 'desc')
                 ->first();
-                if ($comissao) {
-                    $valor_comissao = $contrato->perc_comissao - $comissao->comissao;
-                } else {
-                    $valor_comissao = 0;
-                }
+            if ($comissao) {
+                $valor_comissao = $contrato->perc_comissao - $comissao->comissao;
+            } else {
+                $valor_comissao = 0;
+            }
         } else {
             $comissao = DB::table('perfil')->select("configuracao_comissao.comissao as comissao")
                 ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
@@ -249,11 +252,11 @@ class ProducaoController extends Controller
                 ->orderBy('configuracao_comissao.real_percentual')
                 ->orderBy('configuracao_comissao.perc_pago_inicio', 'desc')
                 ->first();
-                if ($comissao) {
-                    $valor_comissao = $contrato->valor_contrato - $comissao->comissao;
-                } else {
-                    $valor_comissao = 0;
-                }
+            if ($comissao) {
+                $valor_comissao = $contrato->valor_contrato - $comissao->comissao;
+            } else {
+                $valor_comissao = 0;
+            }
         }
 
         return response()->json($valor_comissao);
@@ -264,7 +267,7 @@ class ProducaoController extends Controller
         $this->authorize('VISUALIZAR_PRODUCAO');
 
         $dados = $request->all();
-        
+
         $rulesEdit = [
             'fisicopendente' => 'required',
             'data_fisico' => 'date|sometimes|nullable',
@@ -313,7 +316,7 @@ class ProducaoController extends Controller
     }
 
 
-   public function importaAmx(Request $request)
+    public function importaAmx(Request $request)
     {
         $this->authorize('IMPORTAR_PRODUCAO');
 
@@ -451,7 +454,10 @@ class ProducaoController extends Controller
 
                 $propostas = DB::table($file)->get();
 
+                $total_importado = 0;
+
                 foreach ($propostas as $prop) {
+                    $total_importado = $total_importado + $prop->valor_comissao;
                     if ($prop->dsc_tipo_comissao != 'PRÉ-ADESÃO') {
                         $comissao = DB::table('perfil')->select('configuracao_comissao.comissao as comissao')
                             ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
@@ -488,7 +494,7 @@ class ProducaoController extends Controller
                             ->orderBy('perc_pago_inicio', 'desc')
                             ->first();
                         if ($comissao) {
-                            $valor_comissao = $comissao->comissao;                             
+                            $valor_comissao = $comissao->comissao;
                             if ($prop->perc_comissao - $valor_comissao > 0) {
                                 $corretor_valor_comissao = $prop->valor_contrato - $valor_comissao;
                             } else {
@@ -537,8 +543,18 @@ class ProducaoController extends Controller
                     $producao->usuario = $prop->usuario;
                     $producao->corretor_id = $prop->corretor_id;
                     $producao->tipo = 'I';
+                    $producao->sistema_id = 4;
                     $producao->save();
                 }
+
+                $movimento = new Movimento;
+                $movimento->data_mov = date('Y-m-d');
+                $movimento->tipo = 'R';
+                $movimento->operacao = 'I';
+                $movimento->descricao = "PRODUÇÃO: CORBAN - AMX / WORK BANK";
+                $movimento->valor = $total_importado;
+                $movimento->sistema_id = 4;
+                $movimento->save();
 
                 DB::commit();
 
@@ -638,72 +654,72 @@ class ProducaoController extends Controller
             })
             ->orderBy('tabela_producao.id', 'DESC')
             ->get();
-        
-            $periodo = '';
-            $periodo = 'PERÍODO: '.Carbon::parse($request->all()['inicio'])->format('d/m/Y').' à '.Carbon::parse($request->all()['fim'])->format('d/m/Y');
-        
-            $designer = new TPagamentos();
-            $designer->SetTitle(utf8_decode('Resumo de Produção'));
-            $designer->fromXml(app_path('Http/Controllers/Api/Relatorios/Formularios/extratoCorretor.pdf.xml'));
-            $designer->Dados_Header($periodo, 'Resumo de Produção');
-    
-            $designer->SetAutoPageBreak(true, 45);
-            $designer->generate();
 
-            $designer->SetFillColor(225, 210, 210);                                                    
-            $designer->SetFont('Arial', 'B', 8);
-            $designer->SetX(15);
-            $designer->SetFillColor(200, 200, 200);
-            $designer->Cell(70, 22, 'PROPOSTA', 1, 0, 'C', true);
-            $designer->Cell(80, 22, 'CPF', 1, 0, 'C', true);
-            $designer->Cell(130, 22, 'CLIENTE', 1, 0, 'C', true);
-            $designer->Cell(95, 22, utf8_decode('BANCO'), 1, 0, 'C', true);
-            $designer->Cell(70, 22, utf8_decode('R$ CONTRATO'), 1, 0, 'C', true);
-            $designer->Cell(50, 22, utf8_decode('% BANCO'), 1, 0, 'C', true);
-            $designer->Cell(70, 22, utf8_decode('R$ BANCO'), 1, 0, 'C', true);
-            $designer->Cell(50, 22, utf8_decode('% AGENTE'), 1, 0, 'C', true);
-            $designer->Cell(70, 22, utf8_decode('R$ AGENTE'), 1, 0, 'C', true);
-            $designer->Cell(55, 22, utf8_decode('% EMPRESA'), 1, 0, 'C', true);
-            $designer->Cell(70, 22, utf8_decode('R$ EMPRESA'), 1, 1, 'C', true);            
+        $periodo = '';
+        $periodo = 'PERÍODO: ' . Carbon::parse($request->all()['inicio'])->format('d/m/Y') . ' à ' . Carbon::parse($request->all()['fim'])->format('d/m/Y');
 
-            $designer->SetLineWidth(.4);
-            $designer->SetX(15);
-            foreach ($contratos as $contrato) {               
-    
-                $designer->SetFont('Arial', '', 8);
-                $designer->SetX(15);
-                $designer->Cell(70, 14, $contrato->proposta, 1, 0, 'C');
-                $designer->Cell(80, 14, $contrato->cpf, 1, 0, 'C');
-                $designer->Cell(130, 14, utf8_decode(substr($contrato->cliente, 0, 25)), 1, 0, 'L');
-                $designer->Cell(95, 14, utf8_decode(substr($contrato->banco, 0, 25)), 1, 0, 'L');
-                $designer->Cell(70, 14, number_format($contrato->valor_contrato, 2, ',', '.'), 1, 0, 'R');
-                $designer->Cell(50, 14, number_format($contrato->perc_comissao, 2, ',', '.'), 1, 0, 'R');
-                $designer->Cell(70, 14, number_format($contrato->valor_comissao, 2, ',', '.'), 1, 0, 'R');
-                $designer->Cell(50, 14, number_format($contrato->corretor_perc_comissao, 2, ',', '.'), 1, 0, 'R');
-                $designer->Cell(70, 14, number_format($contrato->corretor_valor_comissao, 2, ',', '.'), 1, 0, 'R');
-                $designer->Cell(55, 14, number_format($contrato->correspondente_perc_comissao, 2, ',', '.'), 1, 0, 'R');
-                $designer->Cell(70, 14, number_format($contrato->correspondente_valor_comissao, 2, ',', '.'), 1, 1, 'R');
-            }
-    
-            $designer->SetFillColor(117, 117, 117);
-            $designer->SetX(15);
-            $designer->SetFont('Arial', 'B', 8);
-            $designer->Cell(375, 22, 'TOTAL GERAL', 1, 0, 'L', true);
-            $designer->Cell(70, 22, number_format($total_contratos, 2, ',', '.'), 1, 0, 'R', true);
-            $designer->Cell(50, 22, '--------', 1, 0, 'C', true);
-            $designer->Cell(70, 22, number_format($total_valor_comissao, 2, ',', '.'), 1, 0, 'R', true);
-            $designer->Cell(50, 22, '--------', 1, 0, 'C', true);
-            $designer->Cell(70, 22, number_format($total_valor_agente, 2, ',', '.'), 1, 0, 'R', true);
-            $designer->Cell(55, 22, '--------', 1, 0, 'C', true);
-            $designer->Cell(70, 22, number_format($total_valor_empresa, 2, ',', '.'), 1, 1, 'R', true);
+        $designer = new TPagamentos();
+        $designer->SetTitle(utf8_decode('Resumo de Produção'));
+        $designer->fromXml(app_path('Http/Controllers/Api/Relatorios/Formularios/extratoCorretor.pdf.xml'));
+        $designer->Dados_Header($periodo, 'Resumo de Produção');
 
-            $file = time().'_resumo_pagamento.pdf';
-            if (!file_exists($file) or is_writable($file)) {
-                header('Access-Control-Allow-Headers: Origin, Content-Type');
-                header('Content-Type: application/pdf');
-                $designer->output('I', $file);
-            } else {
-                return response()->json(['erro' => 'Problemas ao criar arquivo'], 404);
-            }              
+        $designer->SetAutoPageBreak(true, 45);
+        $designer->generate();
+
+        $designer->SetFillColor(225, 210, 210);
+        $designer->SetFont('Arial', 'B', 8);
+        $designer->SetX(15);
+        $designer->SetFillColor(200, 200, 200);
+        $designer->Cell(70, 22, 'PROPOSTA', 1, 0, 'C', true);
+        $designer->Cell(80, 22, 'CPF', 1, 0, 'C', true);
+        $designer->Cell(130, 22, 'CLIENTE', 1, 0, 'C', true);
+        $designer->Cell(95, 22, utf8_decode('BANCO'), 1, 0, 'C', true);
+        $designer->Cell(70, 22, utf8_decode('R$ CONTRATO'), 1, 0, 'C', true);
+        $designer->Cell(50, 22, utf8_decode('% BANCO'), 1, 0, 'C', true);
+        $designer->Cell(70, 22, utf8_decode('R$ BANCO'), 1, 0, 'C', true);
+        $designer->Cell(50, 22, utf8_decode('% AGENTE'), 1, 0, 'C', true);
+        $designer->Cell(70, 22, utf8_decode('R$ AGENTE'), 1, 0, 'C', true);
+        $designer->Cell(55, 22, utf8_decode('% EMPRESA'), 1, 0, 'C', true);
+        $designer->Cell(70, 22, utf8_decode('R$ EMPRESA'), 1, 1, 'C', true);
+
+        $designer->SetLineWidth(.4);
+        $designer->SetX(15);
+        foreach ($contratos as $contrato) {
+
+            $designer->SetFont('Arial', '', 8);
+            $designer->SetX(15);
+            $designer->Cell(70, 14, $contrato->proposta, 1, 0, 'C');
+            $designer->Cell(80, 14, $contrato->cpf, 1, 0, 'C');
+            $designer->Cell(130, 14, utf8_decode(substr($contrato->cliente, 0, 25)), 1, 0, 'L');
+            $designer->Cell(95, 14, utf8_decode(substr($contrato->banco, 0, 25)), 1, 0, 'L');
+            $designer->Cell(70, 14, number_format($contrato->valor_contrato, 2, ',', '.'), 1, 0, 'R');
+            $designer->Cell(50, 14, number_format($contrato->perc_comissao, 2, ',', '.'), 1, 0, 'R');
+            $designer->Cell(70, 14, number_format($contrato->valor_comissao, 2, ',', '.'), 1, 0, 'R');
+            $designer->Cell(50, 14, number_format($contrato->corretor_perc_comissao, 2, ',', '.'), 1, 0, 'R');
+            $designer->Cell(70, 14, number_format($contrato->corretor_valor_comissao, 2, ',', '.'), 1, 0, 'R');
+            $designer->Cell(55, 14, number_format($contrato->correspondente_perc_comissao, 2, ',', '.'), 1, 0, 'R');
+            $designer->Cell(70, 14, number_format($contrato->correspondente_valor_comissao, 2, ',', '.'), 1, 1, 'R');
+        }
+
+        $designer->SetFillColor(117, 117, 117);
+        $designer->SetX(15);
+        $designer->SetFont('Arial', 'B', 8);
+        $designer->Cell(375, 22, 'TOTAL GERAL', 1, 0, 'L', true);
+        $designer->Cell(70, 22, number_format($total_contratos, 2, ',', '.'), 1, 0, 'R', true);
+        $designer->Cell(50, 22, '--------', 1, 0, 'C', true);
+        $designer->Cell(70, 22, number_format($total_valor_comissao, 2, ',', '.'), 1, 0, 'R', true);
+        $designer->Cell(50, 22, '--------', 1, 0, 'C', true);
+        $designer->Cell(70, 22, number_format($total_valor_agente, 2, ',', '.'), 1, 0, 'R', true);
+        $designer->Cell(55, 22, '--------', 1, 0, 'C', true);
+        $designer->Cell(70, 22, number_format($total_valor_empresa, 2, ',', '.'), 1, 1, 'R', true);
+
+        $file = time() . '_resumo_pagamento.pdf';
+        if (!file_exists($file) or is_writable($file)) {
+            header('Access-Control-Allow-Headers: Origin, Content-Type');
+            header('Content-Type: application/pdf');
+            $designer->output('I', $file);
+        } else {
+            return response()->json(['erro' => 'Problemas ao criar arquivo'], 404);
+        }
     }
 }

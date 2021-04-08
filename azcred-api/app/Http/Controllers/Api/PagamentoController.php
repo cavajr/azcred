@@ -6,12 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\Relatorios\Implementacoes\TReciboContrato;
 use App\Http\Controllers\Api\Relatorios\Monetary;
 use App\Models\Corretor;
+use App\Models\Financeiro;
+use App\Models\Movimento;
 use App\Models\Pagamento;
 use App\Models\Producao;
 use App\Models\ViewComissao;
 use Carbon\Carbon;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PagamentoController extends Controller
 {
@@ -31,12 +35,61 @@ class PagamentoController extends Controller
     {
         $this->authorize('VISUALIZAR_PAGAMENTO');
         $dados = $request->all();
+
+        $file = time() . '_temp';
+
+        Schema::create($file, function (Blueprint $table) {
+            $table->increments('corretor');
+            $table->string('tarifa');
+            $table->string('pagamento');
+        });
+
+        foreach ($dados as $key => $value) {
+            $proposta = DB::table($file)->where('corretor', '=', $value['corretor'])->first();
+            if ($proposta === null) {
+                $arr = [
+                    'corretor' => $value['corretor'],
+                    'tarifa' => $value['tarifa'],
+                    'pagamento' => $value['contratos']['corretor_valor_comissao']
+                ];
+
+                $inserido = DB::table($file)->insert(
+                    $arr
+                );
+            } else {
+                DB::table($file)->where('corretor', '=', $value['corretor'])
+                    ->update(
+                        [
+                            'pagamento' => $proposta->pagamento + $value['contratos']['corretor_valor_comissao']
+                        ]
+                    );
+            }
+        }
+
+        $pgtos = DB::table($file)->get();
+
+        foreach ($pgtos as $pgto) {
+            $agente = Corretor::find($pgto->corretor);
+            $movimento = new Movimento;
+            $movimento->data_mov = date('Y-m-d');
+            $movimento->tipo = 'D';
+            $movimento->operacao = 'I';
+            $movimento->descricao = 'PAGAMENTO DE COMISSÃO: ' . $agente->nome;
+            $movimento->valor = $pgto->pagamento - $pgto->tarifa;
+            $movimento->sistema_id = null;
+            $movimento->tabela = 'P';
+            $movimento->save();
+        }
+
+        Schema::dropIfExists($file);
+
         DB::beginTransaction();
         try {
             foreach ($dados as $item) {
                 $tarifa = $item['tarifa'];
                 $corretor = $item['corretor'];
                 $contrato = $item['contratos'];
+
                 $this->efetuarPagamento($corretor, $tarifa, $contrato);
             }
             DB::commit();
@@ -80,6 +133,84 @@ class PagamentoController extends Controller
             }
         }
         return response()->json(['status' => 'OK']);
+    }
+
+    public function atualizaFinanceiro()
+    {
+        DB::beginTransaction();
+        try {
+            // Atualiza os valores de comissao importados
+            $contratos = DB::table('tabela_producao')
+                ->select(DB::raw('sum(valor_comissao) as valor, data_importacao'))
+                ->where('tipo', '=', 'I')
+                ->groupBy('data_importacao')
+                ->orderBy('data_importacao')
+                ->get();
+
+            foreach ($contratos as $contrato) {
+                $movimento = new Movimento;
+                $movimento->data_mov = $contrato->data_importacao;
+                $movimento->tipo = 'R';
+                $movimento->operacao = 'I';
+                $movimento->descricao = 'PRODUÇÃO: CORBAN';
+                $movimento->valor = $contrato->valor;
+                $movimento->sistema_id = null;
+                $movimento->tabela = 'P';
+                $movimento->save();
+            }
+            // FIM - Atualiza os valores de comissao importados
+
+            // Atualiza os valores Operacões de créditos/estornos
+            $contratos = DB::table('tabela_producao')
+                ->select('tabela_producao.id', 'tabela_producao.cliente', 'tabela_producao.operacao', 'tabela_producao.data_importacao', 'tabela_producao.corretor_valor_comissao', 'corretor.nome')
+                ->join('corretor', 'tabela_producao.corretor_id', '=', 'corretor.id')
+                ->where('tipo', '=', 'M')
+                ->where('pago', '=', 'S')
+                ->orderBy('tabela_producao.data_importacao')
+                ->get();
+
+            foreach ($contratos as $contrato) {
+                $movimento = new Movimento;
+                $movimento->data_mov = $contrato->data_importacao;
+                if ($contrato->operacao == 'C') {
+                    $movimento->tipo = 'D';
+                } else {
+                    $movimento->tipo = 'R';
+                }
+                $movimento->operacao = 'M';
+                $movimento->descricao = $contrato->cliente;
+                $movimento->valor = abs($contrato->corretor_valor_comissao);
+                $movimento->sistema_id = $contrato->id;
+                $movimento->tabela = 'P';
+                $movimento->save();
+            }
+            // FIM - Atualiza os valores Operacões de créditos/estornos
+
+            // Atualiza lançamentos financeiros
+            $financeiros = Financeiro::all();
+            foreach ($financeiros as $financeiro) {
+                $movimento = new Movimento;
+                $movimento->data_mov = $financeiro->data_mov;
+                if ($financeiro->tipo == 1) {
+                    $movimento->tipo = 'R';
+                } else {
+                    $movimento->tipo = 'D';
+                }
+                $movimento->operacao = 'M';
+                $movimento->descricao = $financeiro->nome;
+                $movimento->valor = $financeiro->valor;
+                $movimento->sistema_id = $financeiro->id;
+                $movimento->tabela = 'F';
+                $movimento->save();
+            }
+            // FIM - Atualiza lançamentos financeiros
+
+            DB::commit();
+            return response()->json(['status' => 'OK']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json('Erro ao salvar, tente novamente depois', 422);
+        }
     }
 
     private function efetuarPagamento($corretor, $tarifa, $contrato)

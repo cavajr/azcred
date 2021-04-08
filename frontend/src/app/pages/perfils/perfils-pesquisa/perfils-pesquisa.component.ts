@@ -9,6 +9,8 @@ import { PerfilFiltro, PerfilsService } from "../perfils.service";
 
 import { ToastrService } from "ngx-toastr";
 
+import swal from "sweetalert";
+
 @Component({
   selector: "app-perfils-pesquisa",
   templateUrl: "./perfils-pesquisa.component.html",

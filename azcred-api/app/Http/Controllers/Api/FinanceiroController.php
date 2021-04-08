@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Financeiro;
+use App\Models\Movimento;
 use App\Traits\ApiResponser;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class FinanceiroController extends Controller
 {
@@ -27,16 +29,16 @@ class FinanceiroController extends Controller
         }
 
         $financeiro = Financeiro::when($data_mov, function ($query, $data_mov) {
-                    $query->where('data_mov', $data_mov);
-                })        		
-                ->when($nome, function ($query, $nome) {
-                    $query->where('nome', 'LIKE', "%{$nome}%");
-                })
-                ->when($tipo, function ($query, $tipo) {
-                    $query->where('tipo', $tipo);
-                })
-                ->orderBy('data_mov')
-                ->paginate(10);
+            $query->where('data_mov', $data_mov);
+        })
+            ->when($nome, function ($query, $nome) {
+                $query->where('nome', 'LIKE', "%{$nome}%");
+            })
+            ->when($tipo, function ($query, $tipo) {
+                $query->where('tipo', $tipo);
+            })
+            ->orderBy('data_mov')
+            ->paginate(10);
 
         return response()->json($financeiro);
     }
@@ -53,7 +55,7 @@ class FinanceiroController extends Controller
 
             $displayErrors = '';
 
-            foreach($messages->all(":message") as $error){
+            foreach ($messages->all(":message") as $error) {
                 $displayErrors .= $error;
             }
             return response()->json($displayErrors, 422);
@@ -63,8 +65,28 @@ class FinanceiroController extends Controller
             $dados['data_mov'] = Carbon::parse($dados['data_mov'])->format('Y-m-d');
         }
 
-        $financeiro = Financeiro::create($dados);
-        return response()->json($financeiro, 201);
+        DB::beginTransaction();
+        try {
+            $financeiro = Financeiro::create($dados);
+            $movimento = new Movimento;
+            $movimento->data_mov = $financeiro->data_mov;
+            if ($financeiro->tipo == 1) {
+                $movimento->tipo = 'R';
+            } else {
+                $movimento->tipo = 'D';
+            }
+            $movimento->operacao = 'M';
+            $movimento->descricao = $financeiro->nome;
+            $movimento->valor = $financeiro->valor;
+            $movimento->sistema_id = $financeiro->id;
+            $movimento->tabela = 'F';
+            $movimento->save();
+            DB::commit();
+            return response()->json($financeiro, 201);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json('Erro ao salvar, tente novamente depois', 422);
+        }
     }
 
     public function show($id)
@@ -88,7 +110,7 @@ class FinanceiroController extends Controller
 
             $displayErrors = '';
 
-            foreach($messages->all(":message") as $error){
+            foreach ($messages->all(":message") as $error) {
                 $displayErrors .= $error;
             }
             return response()->json($displayErrors, 422);
@@ -98,18 +120,48 @@ class FinanceiroController extends Controller
             $dados['data_mov'] = Carbon::parse($dados['data_mov'])->format('Y-m-d');
         }
 
-        $financeiro = Financeiro::findOrFail($id);
-        $financeiro->update($dados);
-        return $this->showOne($financeiro);
+        DB::beginTransaction();
+        try {
+            $financeiro = Financeiro::findOrFail($id);
+            $financeiro->update($dados);
+
+            $movimento = Movimento::where('operacao', '=', 'M')->where('tabela', '=', 'F')->where('sistema_id', '=', $financeiro->id)->first();
+            $movimento->data_mov = $financeiro->data_mov;
+            if ($financeiro->tipo == 1) {
+                $movimento->tipo = 'R';
+            } else {
+                $movimento->tipo = 'D';
+            }
+            $movimento->operacao = 'M';
+            $movimento->descricao = $financeiro->nome;
+            $movimento->valor = $financeiro->valor;
+            $movimento->tabela = 'F';
+            $movimento->sistema_id = $financeiro->id;
+            $movimento->save();
+
+            return $this->showOne($financeiro);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json('Erro ao salvar, tente novamente depois', 422);
+        }
     }
 
     public function destroy($id)
     {
         $this->authorize('EXCLUIR_LANCAMENTO');
-        $financeiro = Financeiro::findOrFail($id);
+        DB::beginTransaction();
+        try {
+            $financeiro = Financeiro::findOrFail($id);
+            $financeiro->delete();
 
-        $financeiro->delete();
-        return $this->showOne($financeiro);
+            Movimento::where('operacao', '=', 'M')->where('tabela', '=', 'F')->where('sistema_id', '=', $financeiro->id)->delete();
+            DB::commit();
+
+            return $this->showOne($financeiro);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json('Erro ao salvar, tente novamente depois', 422);
+        }
     }
-    
 }

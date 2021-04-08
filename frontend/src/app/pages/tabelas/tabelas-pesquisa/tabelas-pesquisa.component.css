@@ -3,3 +3,14 @@ th,
 td {
   border: 1px solid black;
 }
+
+.table thead th {
+  vertical-align: bottom;
+  /* border-bottom: 2px solid #c8ced3; */
+  background-color: #4c4c4c;
+  color: white;
+}
+
+.table tbody {
+  background-color: #cecece;
+}
