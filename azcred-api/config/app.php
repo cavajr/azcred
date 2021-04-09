@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -137,7 +136,6 @@ return [
      */
 
     'providers' => [
-
         /*
          * Laravel Framework Service Providers...
          */
@@ -184,6 +182,7 @@ return [
 
         Maatwebsite\Excel\ExcelServiceProvider::class,
 
+        Wilgucki\Csv\CsvServiceProvider::class,
     ],
 
     /*
@@ -198,7 +197,6 @@ return [
      */
 
     'aliases' => [
-
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
@@ -239,6 +237,8 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
 
         'FastExcel' => Rap2hpoutre\FastExcel\Facades\FastExcel::class,
-    ],
 
+        'CsvReader' => Wilgucki\Csv\Facades\Reader::class,
+        'CsvWriter' => Wilgucki\Csv\Facades\Writer::class,
+    ],
 ];

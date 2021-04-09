@@ -15,7 +15,7 @@ use CsvReader;
 
 class ComissaoController extends Controller
 {
-    public function importaAmx(Request $request)
+     public function importaAmx(Request $request)
     {
         $this->authorize('IMPORTAR_COMISSAO');
 
@@ -90,6 +90,8 @@ class ComissaoController extends Controller
                     $comissao_ad_dif = 0.00;
                     $comissao_ativacao = 0.00;
                     $comissao_pre_adesao = 0.00;
+                    $comissao_seguro = 0.00;
+                    $comissao_antecipacao = 0.00;
 
                     if (is_null($value->cms_base) === false) {
                         $tipo = explode(' ', $value->cms_base)[0];
@@ -184,6 +186,46 @@ class ComissaoController extends Controller
                                     }
                                 } else {
                                     $comissao_geral_sistema_moeda = $comissao_geral_sistema_moeda + $comissao_pre_adesao;
+                                }
+                            }
+                        }
+                    }
+
+                    if (isset($value->seguro)) {
+                        if (is_null($value->seguro) === false) {
+                            $tipo = explode(' ', $value->seguro)[0];
+                            $comissao_seguro = $this->tofloat(trim(explode(' ', $value->seguro)[1]));
+                            if ($comissao_seguro > 0) {
+                                if ($tipo == '%') {
+                                    $comissao_geral_sistema_percentual = $comissao_geral_sistema_percentual + $comissao_seguro;
+                                    if (trim(explode(' ', $value->seguro)[3] === 'BRUTO')) {
+                                        $comissao_bruto_sistema_percentual = $comissao_bruto_sistema_percentual + $comissao_seguro;
+                                    }
+                                    if (trim(explode(' ', $value->seguro)[3] === 'LÍQUIDO')) {
+                                        $comissao_liquido_sistema_percentual = $comissao_liquido_sistema_percentual + $comissao_seguro;
+                                    }
+                                } else {
+                                    $comissao_geral_sistema_moeda = $comissao_geral_sistema_moeda + $comissao_seguro;
+                                }
+                            }
+                        }
+                    }
+
+                    if (isset($value->antecipacao)) {
+                        if (is_null($value->antecipacao) === false) {
+                            $tipo = explode(' ', $value->antecipacao)[0];
+                            $comissao_antecipacao = $this->tofloat(trim(explode(' ', $value->antecipacao)[1]));
+                            if ($comissao_antecipacao > 0) {
+                                if ($tipo == '%') {
+                                    $comissao_geral_sistema_percentual = $comissao_geral_sistema_percentual + $comissao_antecipacao;
+                                    if (trim(explode(' ', $value->antecipacao)[3] === 'BRUTO')) {
+                                        $comissao_bruto_sistema_percentual = $comissao_bruto_sistema_percentual + $comissao_antecipacao;
+                                    }
+                                    if (trim(explode(' ', $value->antecipacao)[3] === 'LÍQUIDO')) {
+                                        $comissao_liquido_sistema_percentual = $comissao_liquido_sistema_percentual + $comissao_antecipacao;
+                                    }
+                                } else {
+                                    $comissao_geral_sistema_moeda = $comissao_geral_sistema_moeda + $comissao_antecipacao;
                                 }
                             }
                         }
