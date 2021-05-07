@@ -25,7 +25,10 @@ export class ComissaoImportacaoComponent implements OnInit {
   bancoSelecionado: number;
 
   sistema: string;
-  sistemas = [{ label: "AMX / WORK BANK", value: "AMX" }];
+  sistemas = [
+    { label: "AMX / WORK BANK", value: "AMX" },
+    { label: "CEDIBRA", value: "CEDIBRA" }
+  ];
 
   constructor(
     private fb: FormBuilder,

@@ -38,5 +38,23 @@ export class ImportaproducaoService {
           return response;
         });
     }
+
+    if (opcao.sistema === "CEDIBRA") {
+      return this.http
+        .post<any>(`${this.configUrl}/upload-cedibra`, formData)
+        .toPromise()
+        .then(response => {
+          return response;
+        });
+    }
+
+    if (opcao.sistema === "STORM") {
+      return this.http
+        .post<any>(`${this.configUrl}/upload-storm`, formData)
+        .toPromise()
+        .then(response => {
+          return response;
+        });
+    }
   }
 }

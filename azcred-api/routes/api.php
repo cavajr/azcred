@@ -69,8 +69,11 @@ Route::group(['middleware' => ['jwt.auth', 'cors'], 'namespace' => 'Api\\'], fun
     Route::resource('perfil', 'PerfilController');
 
     Route::post('comissao/upload-amx', 'ComissaoController@importaAmx');
+    Route::post('comissao/upload-cedibra', 'ComissaoController@importaCedibra');
 
     Route::post('producao/upload-amx', 'ProducaoController@importaAmx');
+    Route::post('producao/upload-cedibra', 'ProducaoController@importaCedibra');
+    Route::post('producao/upload-storm', 'ProducaoController@importaStorm');
 
     // Estornos
     Route::get('producoes/estornos', 'ProducaoController@estornos');

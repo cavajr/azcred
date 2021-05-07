@@ -19,7 +19,11 @@ export class ProducaoImportacaoComponent implements OnInit {
   imagenTemp: string;
 
   sistema: string;
-  sistemas = [{ label: "AMX / WORK BANK", value: "AMX" }];
+  sistemas = [
+    { label: "AMX / WORK BANK", value: "AMX" },
+    { label: "CEDIBRA", value: "CEDIBRA" },
+    { label: "FONTES / STORM", value: "STORM" }
+  ];
 
   constructor(
     private fb: FormBuilder,

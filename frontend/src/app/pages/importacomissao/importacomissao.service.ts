@@ -36,7 +36,15 @@ export class ImportacomissaoService {
         .post<any>(`${this.configUrl}/upload-amx`, formData, { headers })
         .toPromise()
         .then(response => {
-          console.log(response);
+          return response;
+        });
+    }
+
+    if (opcao.sistema === "CEDIBRA") {
+      return this.http
+        .post<any>(`${this.configUrl}/upload-cedibra`, formData, { headers })
+        .toPromise()
+        .then(response => {
           return response;
         });
     }

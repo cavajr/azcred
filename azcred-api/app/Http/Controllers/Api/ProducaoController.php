@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\Api\Relatorios\Implementacoes\TPagamentos;
+use App\Http\Controllers\Controller;
 use App\Models\Movimento;
 use App\Models\Producao;
 use App\Traits\ApiResponser;
@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class ProducaoController extends Controller
 {
@@ -202,7 +201,7 @@ class ProducaoController extends Controller
             'total_contratos' => $total_contratos,
             'total_valor_comissao' => $total_valor_comissao,
             'total_valor_agente' => $total_valor_agente,
-            'total_valor_empresa' => $total_valor_empresa
+            'total_valor_empresa' => $total_valor_empresa,
         ]);
     }
 
@@ -315,7 +314,6 @@ class ProducaoController extends Controller
         return $this->showOne($contrato);
     }
 
-
     public function importaAmx(Request $request)
     {
         $this->authorize('IMPORTAR_PRODUCAO');
@@ -402,11 +400,7 @@ class ProducaoController extends Controller
                     if (!$corretor) {
                         $corretor_id = null;
                     } else {
-                        if ($corretor->corretor_id === 1) {
-                            $corretor_id = null;
-                        } else {
-                            $corretor_id = $corretor->corretor_id;
-                        }
+                        $corretor_id = $corretor->corretor_id;
                     }
 
                     $proposta = DB::table($file)->where('proposta', '=', $value->num_proposta)->first();
@@ -433,7 +427,7 @@ class ProducaoController extends Controller
                             'corretor_perc_comissao' => 0.00,
                             'corretor_valor_comissao' => 0.00,
                             'corretor_id' => $corretor_id,
-                            'dsc_tipo_comissao' => $value->dsc_tipo_comissao
+                            'dsc_tipo_comissao' => $value->dsc_tipo_comissao,
                         ];
 
                         $inserido = DB::table($file)->insert(
@@ -568,6 +562,241 @@ class ProducaoController extends Controller
             DB::rollback();
             Schema::dropIfExists($file);
 
+            return response()->json('Erro ao importar o arquivo', 422);
+        }
+    }
+
+    public function importaCedibra(Request $request)
+    {
+        $this->authorize('IMPORTAR_PRODUCAO');
+
+        $dados = $request->only(['sistema', 'arquivo']);
+
+        $rules = [
+            'sistema' => 'required',
+            'arquivo' => 'required|mimes:xls,xlsx',
+        ];
+
+        $messages = [
+            'arquivo.required' => 'Favor selecionar um arquivo',
+            'sistema.required' => 'Favor selecionar o sistema',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+
+            $displayErrors = '';
+
+            foreach ($messages->all(':message') as $error) {
+                $displayErrors .= $error;
+                break;
+            }
+
+            return response()->json($displayErrors, 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $path = $request->file('arquivo')->getRealPath();
+
+            $data = Excel::load($path)->get();
+            $total_importado = 0;
+            if ($data->count() > 0) {
+                foreach ($data as $key => $value) {
+
+                    $operacao = null;
+                    $comissao = 0;
+                    if (!is_null($value->vlr_comissao_estornada)) {
+                        $total_importado = $total_importado - $value->vlr_comissao_estornada;
+                        $operacao = 'D';
+                        $comissao = $value->vlr_comissao_estornada;
+                    }
+                    if (!is_null($value->vlr_comissao_parceiro)) {
+                        $total_importado = $total_importado - $value->vlr_comissao_parceiro;
+                        $operacao = 'C';
+                        $comissao = $value->vlr_comissao_parceiro;
+                    }
+
+                    $producao = new Producao();
+                    $producao->cpf = $this->limpaCPF_CNPJ($value->cpf);
+                    $producao->cliente = $value->cliente;
+                    $producao->banco = $value->banco;
+                    $producao->proposta = $value->numero;
+                    $producao->contrato = $value->numero;
+                    $producao->prazo = $value['quant._parcela'];
+                    $producao->produto = $value->operacao;
+                    $producao->tabela = $value->regra;
+                    $producao->fisicopendente = 'S';
+                    $producao->data_fisico = date('Y-m-d'); // data de importação da planilha
+                    $producao->perc_comissao = $value->comissao_parceiro;
+                    $producao->valor_contrato = $value->vlr_emprestimo;
+                    $producao->valor_comissao = $comissao;
+                    $producao->data_operacao = null;
+                    $producao->data_credito_cliente = null;
+                    $producao->data_importacao = date('Y-m-d');
+                    $producao->data_ncr = null;
+                    $producao->operacao = $operacao;
+                    $producao->pago = 'N';
+                    $producao->usuario = null;
+                    $producao->corretor_perc_comissao = 0;
+                    $producao->corretor_valor_comissao = 0;
+                    $producao->correspondente_perc_comissao = 0;
+                    $producao->correspondente_valor_comissao = 0;
+                    $producao->corretor_id = null;
+                    $producao->tipo = 'I';
+                    $producao->sistema_id = 8;
+                    $producao->save();
+                }
+
+                $movimento = new Movimento;
+                $movimento->data_mov = date('Y-m-d');
+                $movimento->tipo = 'R';
+                $movimento->operacao = 'I';
+                $movimento->descricao = "PRODUÇÃO: CORBAN - CEDIBRA";
+                $movimento->valor = $total_importado;
+                $movimento->sistema_id = 8;
+                $movimento->save();
+                DB::commit();
+
+                return response()->json(['status' => 'OK']);
+            } else {
+                return response()->json('Arquivo vazio ou inválido !', 422);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json('Erro ao importar o arquivo', 422);
+        }
+    }
+
+    public function importaStorm(Request $request)
+    {
+        $this->authorize('IMPORTAR_PRODUCAO');
+
+        $dados = $request->only(['sistema', 'arquivo']);
+
+        $rules = [
+            'sistema' => 'required',
+            'arquivo' => 'required|mimes:xls,xlsx',
+        ];
+
+        $messages = [
+            'arquivo.required' => 'Favor selecionar um arquivo',
+            'sistema.required' => 'Favor selecionar o sistema',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+
+            $displayErrors = '';
+
+            foreach ($messages->all(':message') as $error) {
+                $displayErrors .= $error;
+                break;
+            }
+            return response()->json($displayErrors, 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $path = $request->file('arquivo')->getRealPath();
+
+            $data = Excel::load($path)->get();
+
+            if ($data->count() > 0) {
+                foreach ($data as $key => $value) {
+                    if (!is_null($value->nom_banco)) {
+
+                        $tipo = trim(strtolower(substr($value->dsc_situacao_banco, 0, 1)));
+
+                        if (($tipo === 'p') || ($tipo === 'e')) {
+                            $corretor = DB::table('acesso_corretor')->whereRaw('LOWER(usuario) = ? OR LOWER(operador) = ?', [strtolower(trim($value->cod_produtor_venda_banco)), strtolower(trim($value->cod_produtor_venda_banco))])->first();
+                            if (!$corretor) {
+                                $corretor_id = null;
+                            } else {
+                                $corretor_id = $corretor->corretor_id;
+                            }
+                            $operacao = null;
+                            if ($tipo === 'p') {
+                                $operacao = 'C';
+                            }
+                            if ($tipo === 'e') {
+                                $operacao = 'D';
+                            }
+
+                            $corretor_perc_comissao = 0;
+                            $empresa_perc_comissao = 0;
+                            if (is_null($corretor_id)) {
+                                $corretor_perc_comissao = 0;
+                                $empresa_perc_comissao = 0;
+                            } else {
+                                // Calcula comissao do corretor
+                                $comissao = DB::table('perfil')->select('configuracao_comissao.comissao as comissao')
+                                    ->join('configuracao_comissao', 'perfil.id', '=', 'configuracao_comissao.perfil_id')
+                                    ->join('corretor', 'perfil.id', '=', 'corretor.perfil_id')
+                                    ->where('corretor.id', '=', $corretor_id)
+                                    ->where('real_percentual', '=', 0)
+                                    ->whereRaw('perc_pago_inicio <= ' . $value->pcl_comissao)
+                                    ->orderBy('real_percentual')
+                                    ->orderBy('perc_pago_inicio', 'desc')
+                                    ->first();
+
+                                if ($comissao) {
+                                    $valor_comissao = $comissao->comissao;
+                                    $empresa_perc_comissao = $valor_comissao;
+                                    if ($value->pcl_comissao - $valor_comissao > 0) {
+                                        $corretor_perc_comissao = $value->pcl_comissao - $valor_comissao;
+                                    } else {
+                                        $corretor_perc_comissao = 0;
+                                    }
+                                } else {
+                                    $valor_comissao = 0;
+                                    $corretor_perc_comissao = 0;
+                                    $empresa_perc_comissao = $value->pcl_comissao;
+                                }
+                            }
+
+                            $producao = new Producao();
+                            $producao->cpf = $value->cod_cpf_cliente;
+                            $producao->cliente = $value->nom_cliente;
+                            $producao->banco = $value->nom_banco;
+                            $producao->proposta = $value->num_proposta;
+                            $producao->contrato = $value->num_contrato;
+                            $producao->prazo = $value->qtd_parcela;
+                            $producao->produto = $value->dsc_tipo_proposta_emprestimo;
+                            $producao->tabela = $value->dsc_produto;
+                            $producao->fisicopendente = 'S';
+                            $producao->data_fisico = date('Y-m-d'); // data de importação da planilha
+                            $producao->perc_comissao = $value->pcl_comissao;
+                            $producao->valor_contrato = $value->val_base_comissao;
+                            $producao->valor_comissao = $value->val_comissao;
+                            $producao->data_operacao = Carbon::parse($value['dat_emprestimo'])->format('Y-m-d');
+                            $producao->data_credito_cliente = Carbon::parse($value['dat_credito'])->format('Y-m-d');
+                            $producao->data_ncr = date('Y-m-d'); // data de importação da planilha
+                            $producao->usuario = trim($value->cod_produtor_venda_banco);
+                            $producao->pago = 'N';
+                            $producao->operacao = $operacao;
+                            $producao->corretor_perc_comissao = $corretor_perc_comissao;
+                            $producao->corretor_valor_comissao = ($value->val_base_comissao * $corretor_perc_comissao) / 100;
+                            $producao->correspondente_perc_comissao = $empresa_perc_comissao;
+                            $producao->correspondente_valor_comissao = ($value->val_base_comissao * $empresa_perc_comissao) / 100;
+                            $producao->corretor_id = $corretor_id;
+                            $producao->tipo = 'I';
+                            $producao->sistema_id = 9;
+                            $producao->save();
+                        }
+                    }
+                }
+
+                DB::commit();
+
+                return response()->json(['status' => 'OK']);
+            } else {
+                return response()->json('Arquivo vazio ou inválido !', 422);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
             return response()->json('Erro ao importar o arquivo', 422);
         }
     }
@@ -721,5 +950,15 @@ class ProducaoController extends Controller
         } else {
             return response()->json(['erro' => 'Problemas ao criar arquivo'], 404);
         }
+    }
+
+    private function limpaCPF_CNPJ($valor)
+    {
+        $valor = trim($valor);
+        $valor = str_replace(".", "", $valor);
+        $valor = str_replace(",", "", $valor);
+        $valor = str_replace("-", "", $valor);
+        $valor = str_replace("/", "", $valor);
+        return $valor;
     }
 }

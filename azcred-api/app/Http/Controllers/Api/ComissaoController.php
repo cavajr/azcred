@@ -4,18 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tabela;
-use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
-use Rap2hpoutre\FastExcel\FastExcel;
-use CsvReader;
 
 class ComissaoController extends Controller
 {
-     public function importaAmx(Request $request)
+    public function importaAmx(Request $request)
     {
         $this->authorize('IMPORTAR_COMISSAO');
 
@@ -92,6 +89,7 @@ class ComissaoController extends Controller
                     $comissao_pre_adesao = 0.00;
                     $comissao_seguro = 0.00;
                     $comissao_antecipacao = 0.00;
+                    $comissao_carencia = 0.00;
 
                     if (is_null($value->cms_base) === false) {
                         $tipo = explode(' ', $value->cms_base)[0];
@@ -231,6 +229,26 @@ class ComissaoController extends Controller
                         }
                     }
 
+                    if (isset($value->carencia)) {
+                        if (is_null($value->carencia) === false) {
+                            $tipo = explode(' ', $value->carencia)[0];
+                            $comissao_carencia = $this->tofloat(trim(explode(' ', $value->carencia)[1]));
+                            if ($comissao_carencia > 0) {
+                                if ($tipo == '%') {
+                                    $comissao_geral_sistema_percentual = $comissao_geral_sistema_percentual + $comissao_carencia;
+                                    if (trim(explode(' ', $value->carencia)[3] === 'BRUTO')) {
+                                        $comissao_bruto_sistema_percentual = $comissao_bruto_sistema_percentual + $comissao_carencia;
+                                    }
+                                    if (trim(explode(' ', $value->carencia)[3] === 'LÍQUIDO')) {
+                                        $comissao_liquido_sistema_percentual = $comissao_liquido_sistema_percentual + $comissao_carencia;
+                                    }
+                                } else {
+                                    $comissao_geral_sistema_moeda = $comissao_geral_sistema_moeda + $comissao_carencia;
+                                }
+                            }
+                        }
+                    }
+
                     $arr[] = [
                         'banco_id' => $dados['banco'],
                         'convenio_id' => $dados['convenio'],
@@ -261,6 +279,115 @@ class ComissaoController extends Controller
         }
     }
 
+    public function importaCedibra(Request $request)
+    {
+        $this->authorize('IMPORTAR_COMISSAO');
+
+        $dados = $request->only(['sistema', 'banco', 'convenio', 'tipo', 'arquivo', 'mostrarPor']);
+
+        $rules = [
+            'sistema' => 'required',
+            'arquivo' => 'required|mimes:xls,xlsx',
+            'banco' => 'required',
+            'convenio' => 'required',
+            'tipo' => 'required',
+        ];
+
+        $messages = [
+            'arquivo.required' => 'Favor selecionar um arquivo',
+            'sistema.required' => 'Favor selecionar o sistema',
+            'banco.required' => 'Favor selecionar um banco',
+            'convenio.required' => 'Favor selecionar um convênio',
+            'tipo.required' => 'Favor selecionar um tipo de contrato',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        if ($validator->fails()) {
+            $messages = $validator->messages();
+
+            $displayErrors = '';
+
+            foreach ($messages->all(':message') as $error) {
+                $displayErrors .= $error;
+                break;
+            }
+
+            return response()->json($displayErrors, 422);
+        }
+
+        $existeReg = Tabela::where('banco_id', '=', $dados['banco'])
+            ->where('convenio_id', '=', $dados['convenio'])
+            ->where('tipo_id', '=', $dados['tipo'])
+            ->count();
+
+        DB::beginTransaction();
+        try {
+            if ($existeReg > 0) {
+                $apagado = Tabela::where('banco_id', '=', $dados['banco'])
+                    ->where('convenio_id', '=', $dados['convenio'])
+                    ->where('tipo_id', '=', $dados['tipo'])
+                    ->delete();
+            }
+
+            $path = $request->file('arquivo')->getRealPath();
+
+            $data = Excel::load($path)->get();
+
+            if ($data->count() > 0) {
+                foreach ($data as $key => $value) {
+
+                    $data = trim(explode(' ', $value->vigencia)[0]);
+                    $vigencia = DateTime::createFromFormat('Y-m-d', $data);
+
+                    $comissao_geral_sistema_moeda = 0.00;
+                    $comissao_geral_sistema_percentual = 0.00;
+                    $comissao_liquido_sistema_percentual = 0.00;
+                    $comissao_bruto_sistema_percentual = 0.00;
+
+                    $comissao_geral_sistema_percentual = $value->comissao;
+
+                    if ($comissao_geral_sistema_percentual > 0) {
+                        if ($dados['mostrarPor'] === 'B') {
+                            $comissao_bruto_sistema_percentual = $comissao_geral_sistema_percentual;
+                        }
+                        if ($dados['mostrarPor'] === 'L') {
+                            $comissao_liquido_sistema_percentual = $comissao_geral_sistema_percentual;
+                        }
+                    }
+
+                    if (!is_null($value->regra)) {
+                        $arr[] = [
+                            'banco_id' => $dados['banco'],
+                            'convenio_id' => $dados['convenio'],
+                            'tipo_id' => $dados['tipo'],
+                            'tabela' => $value->regra . ' - ' . $value->taxa,
+                            'vigencia' => $vigencia,
+                            'prazo' => $value->prazo,
+                            'comissao_geral_sistema_moeda' => $comissao_geral_sistema_moeda,
+                            'comissao_geral_sistema_percentual' => $comissao_geral_sistema_percentual,
+                            'comissao_liquido_sistema_percentual' => $comissao_liquido_sistema_percentual,
+                            'comissao_bruto_sistema_percentual' => $comissao_bruto_sistema_percentual,
+                            'codigo_mg' => null,
+                            'sistema_id' => 8,
+                        ];
+                    }
+
+                }
+
+                Tabela::insert($arr);
+
+                DB::commit();
+
+                return response()->json(['status' => 'OK']);
+            } else {
+                return response()->json('Arquivo vazio ou inválido !', 422);
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json('Erro ao importar o arquivo', 422);
+        }
+    }
+
     public function tofloat($num)
     {
         $dotPos = strrpos($num, '.');
@@ -273,7 +400,7 @@ class ComissaoController extends Controller
 
         return floatval(
             preg_replace('/[^0-9]/', '', substr($num, 0, $sep)) . '.' .
-                preg_replace('/[^0-9]/', '', substr($num, $sep + 1, strlen($num)))
+            preg_replace('/[^0-9]/', '', substr($num, $sep + 1, strlen($num)))
         );
     }
 
